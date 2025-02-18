@@ -7,6 +7,9 @@ import { JwtService } from '@nestjs/jwt';
 import { appConfig } from 'src/configs/app.config';
 import { UserEntity } from '../users/entities/users.entity';
 import * as moment from 'moment-timezone';
+import { generateOtp } from 'src/common/function-helper/generate-otp';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EVENT_EMITTER } from 'src/common/constants/event-emitter.enum';
 
 
 const { jwt } = appConfig;
@@ -17,6 +20,7 @@ export class AuthService {
     constructor(
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
+        private eventEmitter: EventEmitter2,
     ) { }
     async register(createUserDto: CreateUserDto) {
         const { password, email } = createUserDto;
@@ -57,5 +61,14 @@ export class AuthService {
         return result;
     }
 
-    async forgotPassword() { }
+    async forgotPassword(email: string) {
+        const user = await this.usersService.findOne(email);
+        if (!user) throw new BadRequestException('USER_NOT_FOUND');
+        const otp = generateOtp();
+        this.eventEmitter.emit(EVENT_EMITTER.MAIL.SEND_EMAIL_RESET_PASSWORD,
+            email,
+            otp,
+        );
+        return true;
+    }
 }

@@ -18,11 +18,21 @@ export const appConfig = {
         secret: process.env.JWT_SECRET,
         expiresIn: process.env.JWT_EXPIRES_IN,
         refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+        resetPasswordExpiresIn: process.env.JWT_RESET_PASSWORD_EXPIRES_IN,
     },
     cloudinarySetting: {
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
         api_key: process.env.CLOUDINARY_API_KEY,
         api_secret: process.env.CLOUDINARY_API_SECRET,
+    },
+    email: {
+        googleId: process.env.GOOGLE_CLIENT_ID,
+        redirectUri: process.env.GOOGLE_REDIRECT_URI,
+        user: process.env.HOST_EMAIL_USER,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
     }
+
 }
 

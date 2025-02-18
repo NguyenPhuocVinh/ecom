@@ -40,7 +40,6 @@
 //         };
 //     }
 // }
-import { Injectable } from '@nestjs/common';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 
 export interface PaginatedResult<T> {
@@ -51,9 +50,12 @@ export interface PaginatedResult<T> {
     totalPages: number;
 }
 
-@Injectable()
 export class BaseService<T> {
-    constructor(protected readonly repository: Repository<T>) { }
+    protected repository: Repository<T>;
+
+    constructor(repository: Repository<T>) {
+        this.repository = repository;
+    }
 
     async paginate(
         queryBuilder: SelectQueryBuilder<T>,
@@ -75,5 +77,4 @@ export class BaseService<T> {
             totalPages,
         };
     }
-
 }

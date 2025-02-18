@@ -12,6 +12,8 @@ export enum ENTITY_NAME {
     CART = 'carts',
     POST = 'posts',
     INVENTORY = 'inventories',
+    TEMPLATE_MAIL = 'template_mails',
+    OTP = 'otps',
 }
 
 export enum TYPE_FILE {

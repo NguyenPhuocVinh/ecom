@@ -10,6 +10,8 @@ import { RolesModule } from './apis/roles/roles.module';
 import { MediasModule } from './apis/medias/medias.module';
 import { TenantsModule } from './apis/tenants/tenants.module';
 import { AuthModule } from './apis/auth/auth.module';
+import { MailsModule } from './apis/mails/mails.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 const { db } = appConfig;
 @Module({
   imports: [
@@ -29,12 +31,14 @@ const { db } = appConfig;
         synchronize: true,
       })
     }),
+    EventEmitterModule.forRoot(),
     UsersModule,
     PermissionsModule,
     RolesModule,
     MediasModule,
     TenantsModule,
     AuthModule,
+    MailsModule
   ],
   controllers: [AppController],
   providers: [AppService],
