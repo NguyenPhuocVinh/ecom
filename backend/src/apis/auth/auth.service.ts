@@ -26,8 +26,8 @@ export class AuthService {
         private readonly mailsService: MailsService,
     ) { }
     async register(createUserDto: CreateUserDto) {
-        const { password, email } = createUserDto;
-        const isExistUser = await this.usersService.checkUserExist(email);
+        const { password, email, tenant } = createUserDto;
+        const isExistUser = await this.usersService.checkUserExist(email, tenant);
         const hashedPassword = await bcrypt.hash(password, 10);
         return isExistUser ? Promise.reject(new BadRequestException('USER_EXISTED')) : this.usersService.createUser({ ...createUserDto, password: hashedPassword });
     }
@@ -45,8 +45,8 @@ export class AuthService {
         }
     }
 
-    async validateUser(email: string, password: string): Promise<any> {
-        const user = await this.usersService.findOne(email);
+    async validateUser(email: string, password: string, tenant: string): Promise<any> {
+        const user = await this.usersService.findOne(email, tenant);
         const isMatch = await bcrypt.compare(password, user.password);
         if (user && isMatch) {
             return user;
@@ -64,22 +64,24 @@ export class AuthService {
         return result;
     }
 
-    async forgotPassword(email: string) {
-        const user = await this.usersService.findOne(email);
+    async forgotPassword(email: string, tenant: string) {
+        const user = await this.usersService.findOne(email, tenant);
         if (!user) throw new BadRequestException('USER_NOT_FOUND');
-        const resetPasswordToken = this.jwtService.sign(_.pick(user, [
-            'id',
-            'lastName',
-            'firstName',
-            'email',
-            'role.id',
-            'activeLogin',
-            'lastLoginVer',
-        ]),
-            {
-                secret: jwt.secret,
-                expiresIn: jwt.resetPasswordExpiresIn
-            });
+        const payload = {
+            id: user.id,
+            lastName: user.lastName,
+            firstName: user.firstName,
+            email: user.email,
+            role: { id: user.role.id },
+            tenants: user.tenants.map(tenant => tenant.id),
+            activeLogin: user.activeLogin,
+            lastLoginVer: user.lastLoginVer,
+        };
+
+        const resetPasswordToken = this.jwtService.sign(payload, {
+            secret: jwt.secret,
+            expiresIn: jwt.resetPasswordExpiresIn,
+        });
         await this.mailsService.sendEmailResetPassword(email, resetPasswordToken);
         return true;
     }

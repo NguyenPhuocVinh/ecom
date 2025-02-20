@@ -17,29 +17,43 @@ export class UsersService {
         @InjectRepository(OtpEntity)
         private readonly otpRepository: Repository<OtpEntity>,
     ) { }
-    async checkUserExist(email: string) {
-        const user = await this.userRepository.count({ where: { email } });
+    async checkUserExist(email: string, tenant?: string) {
+        const user = await this.userRepository
+            .createQueryBuilder('user')
+            .leftJoin('user.tenants', 'tenant')
+            .where('user.email = :email', { email })
+            .andWhere('tenant.id = :tenantId', { tenantId: tenant })
+            .getCount();
         return !!user;
     }
     async createUser(createUserDto: CreateUserDto) {
         const user = this.userRepository.create({
             ...createUserDto,
+            tenants: [{ id: createUserDto.tenant }],
             role: { id: createUserDto.role } as any,
         });
         await this.userRepository.save(user);
         return user;
     }
 
-    async findOne(email: string) {
-        return this.userRepository.findOne({ where: { email }, relations: ['role'] });
+    async findOne(email: string, tenant?: string) {
+        const user = await this.userRepository
+            .createQueryBuilder('user')
+            .leftJoinAndSelect('user.tenants', 'tenant')
+            .leftJoinAndSelect('user.role', 'role')
+            .where('user.email = :email', { email })
+            .andWhere('tenant.id = :tenantId', { tenantId: tenant })
+            .getOne();
+        return user;
     }
 
     async updateById(id: string, data: Partial<UserEntity>) {
         await this.userRepository.update(id, data);
-        return await this.userRepository.findOne({ where: { id }, relations: ['role'] });
+        return await this.userRepository.findOne({ where: { id }, relations: ['role', 'tenants'] });
     }
 
-    async forgotPassword(email: string, otp: string) {
+    async forgotPassword(email: string, otp: string, req: any) {
+
         const user = await this.findOne(email);
         if (!user) throw new BadRequestException('USER_NOT_FOUND');
         const foundOtp = await this.otpRepository.findOne({ where: { user: { id: user.id } } });
@@ -53,7 +67,8 @@ export class UsersService {
     }
 
     async resetPassword(newPassword: string, req: any) {
-        const user = await this.findOne(req.user.email);
+        const { email, tenants } = req.user;
+        const user = await this.findOne(email, tenants[0]);
         if (!user) throw new BadRequestException('USER_NOT_FOUND');
         const isMatch = await bcrypt.compare(newPassword, user.password);
         if (isMatch) throw new BadRequestException('PASSWORD_IS_SAME');

@@ -2,9 +2,10 @@ import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/entities/dto/create-user.dto';
 import { LocalAuthGuard } from 'src/cores/guards/local-auth.guard';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiHeader, ApiProperty } from '@nestjs/swagger';
 import { UserLoginDto } from '../users/entities/dto/login.dto';
 import { Authorize, AuthorizeResetPassWord } from 'src/cores/decorators/auth/authorization.decorator';
+import { Tenant } from 'src/cores/decorators/tenant.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -21,6 +22,11 @@ export class AuthController {
 
     @Post('login')
     @UseGuards(LocalAuthGuard)
+    @ApiHeader({
+        name: 'x-tenant-id',
+        description: 'Tenant ID for multi-tenant authentication, example: e438b3e4-507b-49e0-b5a9-2f6d4e740648',
+        required: true,
+    })
     @ApiBody({
         description: 'User credentials',
         type: UserLoginDto,
@@ -32,18 +38,25 @@ export class AuthController {
     }
 
     @Post('forgot-password')
-    @ApiBody({
-        description: 'Email',
-        type: String,
+    @ApiHeader({
+        name: 'x-tenant-id',
+        description: 'Tenant ID for multi-tenant authentication, example: e438b3e4-507b-49e0-b5a9-2f6d4e740648',
+        required: true,
     })
     async forgotPassword(
         @Body('email') email: string,
+        @Tenant() tenant: string,
     ) {
-        return this.authService.forgotPassword(email);
+        return this.authService.forgotPassword(email, tenant);
     }
 
-    @AuthorizeResetPassWord()
     @Post('reset-password')
+    @AuthorizeResetPassWord()
+    @ApiBearerAuth()
+    @ApiBody({
+        description: 'New password',
+        type: String,
+    })
     async resetPassword(
         @Req() req: any,
         @Body('newPassword') newPassword: string,
@@ -53,6 +66,7 @@ export class AuthController {
 
     @Post('refresh-token')
     async refreshToken(
+        @Tenant() tenant: string,
         @Body('refresh_token') refreshToken: string,
     ) {
         return await this.authService.refreshToken(refreshToken);

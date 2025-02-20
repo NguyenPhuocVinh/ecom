@@ -20,4 +20,8 @@ export class TenantsService {
         await this.tenantRepository.save(tenant);
         return tenant;
     }
+
+    async getAll() {
+        return await this.tenantRepository.find();
+    }
 }
