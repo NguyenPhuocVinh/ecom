@@ -7,6 +7,9 @@ import { appConfig } from 'src/configs/app.config';
 import { LocalStrategy } from 'src/cores/strategy/local.strategy';
 import { JwtStrategy } from 'src/cores/strategy/jwt.strategy';
 import { RolesModule } from '../roles/roles.module';
+import { MailsModule } from '../mails/mails.module';
+import { JwtResetPasswordGuard } from 'src/cores/guards/jwt-resetPassword.guard';
+import { JwtResetPassWordStrategy } from 'src/cores/strategy/jwt-resetPassword.strategy';
 const { jwt } = appConfig
 @Module({
   imports: [
@@ -15,13 +18,15 @@ const { jwt } = appConfig
       signOptions: { expiresIn: jwt.expiresIn }
     }),
     UsersModule,
-    RolesModule
+    RolesModule,
+    MailsModule
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
     LocalStrategy,
-    JwtStrategy
+    JwtStrategy,
+    JwtResetPassWordStrategy
   ],
 })
 export class AuthModule { }

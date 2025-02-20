@@ -30,15 +30,12 @@ export class MailsService {
         return await this.templateMailRepository.findOne({ where: { id } });
     }
 
-    @OnEvent(EVENT_EMITTER.MAIL.SEND_EMAIL_RESET_PASSWORD)
-    async sendEmailResetPassword(templateId: string, to: string) {
-        const template = await this.templateMailRepository.findOne({ where: { id: templateId } });
-        if (!template) throw new NotFoundException('TEMPLATE_NOT_FOUND');
+    async sendEmailResetPassword(to: string, data: any) {
         return await this.mailerService.sendMail({
             from: process.env.HOST_EMAIL_USER,
             to,
-            subject: template.subject,
-            html: template.body
+            subject: 'Reset password',
+            html: 'Your reset password code is: ' + data,
         });
     }
 }

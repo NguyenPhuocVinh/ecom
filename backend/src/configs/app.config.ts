@@ -26,11 +26,12 @@ export const appConfig = {
         api_secret: process.env.CLOUDINARY_API_SECRET,
     },
     email: {
-        googleId: process.env.GOOGLE_CLIENT_ID,
+        host: process.env.HOST_EMAIL,
+        port: parseInt(process.env.HOST_EMAIL_PORT),
         redirectUri: process.env.GOOGLE_REDIRECT_URI,
-        user: process.env.HOST_EMAIL_USER,
-        clientId: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET,
+        user: process.env.GOOGLE_EMAIL_USER,
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
     }
 

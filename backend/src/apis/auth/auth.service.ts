@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/entities/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -10,6 +10,8 @@ import * as moment from 'moment-timezone';
 import { generateOtp } from 'src/common/function-helper/generate-otp';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EVENT_EMITTER } from 'src/common/constants/event-emitter.enum';
+import { MailerService } from '../mailer/mailer.service';
+import { MailsService } from '../mails/mails.service';
 
 
 const { jwt } = appConfig;
@@ -21,6 +23,7 @@ export class AuthService {
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
         private eventEmitter: EventEmitter2,
+        private readonly mailsService: MailsService,
     ) { }
     async register(createUserDto: CreateUserDto) {
         const { password, email } = createUserDto;
@@ -64,11 +67,44 @@ export class AuthService {
     async forgotPassword(email: string) {
         const user = await this.usersService.findOne(email);
         if (!user) throw new BadRequestException('USER_NOT_FOUND');
-        const otp = generateOtp();
-        this.eventEmitter.emit(EVENT_EMITTER.MAIL.SEND_EMAIL_RESET_PASSWORD,
-            email,
-            otp,
-        );
+        const resetPasswordToken = this.jwtService.sign(_.pick(user, [
+            'id',
+            'lastName',
+            'firstName',
+            'email',
+            'role.id',
+            'activeLogin',
+            'lastLoginVer',
+        ]),
+            {
+                secret: jwt.secret,
+                expiresIn: jwt.resetPasswordExpiresIn
+            });
+        await this.mailsService.sendEmailResetPassword(email, resetPasswordToken);
         return true;
     }
+
+    async resetPassword(newPassword: string, req: any) {
+        return await this.usersService.resetPassword(newPassword, req);
+    }
+
+    async refreshToken(refreshToken: string,) {
+
+        const verifyToken = this.jwtService.verify(refreshToken, { secret: jwt.secret });
+        if (!verifyToken) {
+            throw new UnauthorizedException('Invalid token');
+        }
+
+        const payload = verifyToken.user;
+        const [access_token, refresh_token] = await Promise.all([
+            this.jwtService.sign(payload, { secret: jwt.secret, expiresIn: jwt.expiresIn }),
+            this.jwtService.sign(payload, { secret: jwt.secret, expiresIn: jwt.refreshExpiresIn }),
+        ]);
+
+        return {
+            access_token,
+            refresh_token,
+        }
+    }
+
 }

@@ -14,6 +14,7 @@ export enum ENTITY_NAME {
     INVENTORY = 'inventories',
     TEMPLATE_MAIL = 'template_mails',
     OTP = 'otps',
+    TOKEN = 'tokens',
 }
 
 export enum TYPE_FILE {

@@ -1,14 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { google } from 'googleapis';
-import nodemailer, { Transporter } from 'nodemailer';
 import { appConfig } from 'src/configs/app.config';
+import * as nodemailer from 'nodemailer';
+import { Transporter } from 'nodemailer';
 
 @Injectable()
 export class MailerService {
     private transporter: Transporter;
     private readonly logger = new Logger(MailerService.name);
     private readonly oAuth2Client = new google.auth.OAuth2(
-        appConfig.email.googleId,
+        appConfig.email.clientId,
         appConfig.email.clientSecret,
         appConfig.email.redirectUri,
     );
@@ -30,7 +31,7 @@ export class MailerService {
                     user: appConfig.email.user,
                     clientId: appConfig.email.clientId,
                     clientSecret: appConfig.email.clientSecret,
-                    refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+                    refreshToken: appConfig.email.refreshToken,
                     accessToken: accessToken,
                 },
             });
