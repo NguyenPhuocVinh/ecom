@@ -1,6 +1,7 @@
 import 'dotenv/config';
 
 export const appConfig = {
+    appName: process.env.APP_NAME,
     db: {
         type: process.env.DB_TYPE as any || 'postgres',
         host: process.env.DB_HOST || 'localhost',
@@ -33,6 +34,11 @@ export const appConfig = {
         clientId: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+    },
+    redis: {
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT),
+        password: process.env.REDIS_PASSWORD,
     }
 
 }

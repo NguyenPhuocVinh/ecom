@@ -1,4 +1,3 @@
-import { TenantEntity } from "src/apis/tenants/entities/tenants.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export class BaseEntity {

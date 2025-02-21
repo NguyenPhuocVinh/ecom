@@ -24,20 +24,19 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
         password: string,
     ): Promise<any> {
         const contextId = ContextIdFactory.getByRequest(request);
-        const tenantId = request.headers['x-tenant-id'];
-        if (!tenantId) throw new UnauthorizedException('Missing tenant id in header');
+        // const tenantId = request.headers['x-tenant-id'];
+        // if (!tenantId) throw new UnauthorizedException('Missing tenant id in header');
         const authService = await this.moduleRef.resolve(AuthService, contextId);
-        let user = await authService.validateUser(email, password, tenantId);
+        let user = await authService.validateUser(email, password);
         user = await authService.processLogin(user);
         if (!user) throw new UnauthorizedException();
-        user.tenants = user.tenants.map(tenant => tenant.id);
         return _.pick(user, [
             'id',
             'lastName',
             'firstName',
             'email',
             'role.id',
-            'tenants',
+            // 'tenants',
             'activeLogin',
             'lastLoginVer',
         ]);

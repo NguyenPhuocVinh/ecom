@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LoggingInterceptor } from './cores/interceptors/logging.interceptor';
 import { AllExceptionsFilter } from './cores/filters/error.filter';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -15,6 +16,12 @@ async function bootstrap() {
   // Đặt global prefix cho tất cả các route
   app.setGlobalPrefix('api/v1');
 
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: false,
+    }),
+  );
   // Cấu hình Swagger
   const swaggerOptions = new DocumentBuilder()
     .setTitle('Ecom API')

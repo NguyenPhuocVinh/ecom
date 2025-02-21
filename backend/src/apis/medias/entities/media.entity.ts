@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { TenantEntity } from 'src/apis/tenants/entities/tenants.entity';
+import { CategoryEntity } from 'src/apis/categories/entities/category.entity';
 import { UserEntity } from 'src/apis/users/entities/users.entity';
 import { ENTITY_NAME } from 'src/common/constants/enum';
 import { BaseEntity } from 'src/cores/entities/base.entity';
@@ -73,8 +73,8 @@ export class FileEntity extends BaseEntity {
     @ManyToOne(() => UserEntity, (user) => user.cover, { nullable: true })
     user: UserEntity;
 
-    @OneToOne(() => TenantEntity, (tenant) => tenant.logo, { nullable: true })
-    tenantLogo: TenantEntity;
+    @OneToOne(() => CategoryEntity, (category) => category.cover, { nullable: true })
+    category: CategoryEntity;
 
     @BeforeInsert()
     async generateAlt() {

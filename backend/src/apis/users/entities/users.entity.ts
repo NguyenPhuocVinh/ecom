@@ -1,11 +1,11 @@
 import { TemplateMailEntity } from 'src/apis/mails/entities/template-mails.entity';
 import { FileEntity } from 'src/apis/medias/entities/media.entity';
 import { RoleEntity } from 'src/apis/roles/entities/roles.entity';
-import { TenantEntity } from 'src/apis/tenants/entities/tenants.entity';
 import { ENTITY_NAME } from 'src/common/constants/enum';
 import { BaseEntity } from 'src/cores/entities/base.entity';
 import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { OtpEntity } from './otp.entity';
+import { CategoryEntity } from 'src/apis/categories/entities/category.entity';
 
 @Entity({ name: ENTITY_NAME.USER })
 export class UserEntity extends BaseEntity {
@@ -34,11 +34,10 @@ export class UserEntity extends BaseEntity {
     lastLoginVer: string;
 
     @Column("text", { array: true, default: [] })
-    activeLogin: string[];
+    activeLogin: string[];;
 
-    @ManyToMany(() => TenantEntity, (tenant) => tenant.user)
-    @JoinTable()
-    tenants: TenantEntity[];
+    @Column({ nullable: true })
+    refreshToken: string;
 
     @ManyToOne(() => RoleEntity, (role) => role.user)
     role: RoleEntity;
@@ -51,6 +50,9 @@ export class UserEntity extends BaseEntity {
 
     @OneToOne(() => OtpEntity, (otp) => otp.user)
     otp: OtpEntity;
+
+    @OneToMany(() => CategoryEntity, (category) => category.createdBy)
+    categories: CategoryEntity[];
 
     @BeforeInsert()
     async beforeInsert() {

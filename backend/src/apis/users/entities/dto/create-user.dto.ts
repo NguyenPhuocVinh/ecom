@@ -30,9 +30,4 @@ export class CreateUserDto {
     @IsOptional()
     @IsString()
     role?: string;
-
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    tenant: string;
 }

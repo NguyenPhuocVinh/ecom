@@ -23,3 +23,38 @@ export enum TYPE_FILE {
     AUDIO = 'audio',
     DOCUMENT = 'document',
 }
+
+export enum OPERATOR {
+    LIKE = 'LIKE',
+    NOT_LIKE = 'NOTLIKE',
+    IN = 'IN',
+    NOT_IN = 'NOTIN',
+    BETWEEN = 'BTW',
+    ISNULL = 'ISNULL',
+    BEFORE = 'LT',
+    IS_AND_BEFORE = 'LTEQ',
+    AFTER = 'GT',
+    IS_AND_AFTER = 'GTEQ',
+    IS = 'IS',
+    NOT = 'NOT',
+    IS_EMPTY = 'ISEMPTY',
+    FULL_TEXT_SEARCH = 'FULL_TEXT_SEARCH',
+    GT = 'GT',
+    GTEQ = 'GTEQ',
+    LT = 'LT',
+    LTEQ = 'LTEQ',
+    IS_NOT_NULL = 'ISNOTNULL',
+    IS_NOT_EMPTY = 'ISNOTEMPTY',
+    IS_NOT = 'ISNOT',
+    IS_NOT_IN = 'ISNOTIN',
+}
+
+export enum CONSTANT {
+    LIMIT = 10,
+    ALL = 1000000000,
+}
+
+export enum STATUS {
+    ACTIVED = 'actived',
+    DELETED = 'deleted',
+}
