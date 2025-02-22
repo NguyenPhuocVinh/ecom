@@ -14,6 +14,9 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { BullModule } from '@nestjs/bull';
 import { CacheManagerModule } from './cores/cache-manager/cache-manager.module';
 import { CategoriesModule } from './apis/categories/categories.module';
+import { StoresModule } from './apis/stores/stores.module';
+import { ProductsModule } from './apis/products/products.module';
+import { InventoriesModule } from './apis/inventories/inventories.module';
 
 
 const { db, redis } = appConfig;
@@ -56,6 +59,9 @@ const { db, redis } = appConfig;
     AuthModule,
     MailsModule,
     CategoriesModule,
+    StoresModule,
+    ProductsModule,
+    InventoriesModule,
     CacheManagerModule
   ],
   controllers: [AppController],

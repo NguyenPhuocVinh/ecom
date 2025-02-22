@@ -6,6 +6,7 @@ import { BaseEntity } from 'src/cores/entities/base.entity';
 import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { OtpEntity } from './otp.entity';
 import { CategoryEntity } from 'src/apis/categories/entities/category.entity';
+import { StoreEntity } from 'src/apis/stores/entities/store.entity';
 
 @Entity({ name: ENTITY_NAME.USER })
 export class UserEntity extends BaseEntity {
@@ -53,6 +54,9 @@ export class UserEntity extends BaseEntity {
 
     @OneToMany(() => CategoryEntity, (category) => category.createdBy)
     categories: CategoryEntity[];
+
+    // @ManyToOne(() => StoreEntity, (store) => store.managers)
+    // store: StoreEntity;
 
     @BeforeInsert()
     async beforeInsert() {

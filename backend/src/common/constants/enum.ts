@@ -15,6 +15,10 @@ export enum ENTITY_NAME {
     TEMPLATE_MAIL = 'template_mails',
     OTP = 'otps',
     TOKEN = 'tokens',
+    NOTIFICATION = 'notifications',
+    PRICE = 'prices',
+    STORE = 'stores',
+    INVENTORY_ITEM = 'inventory_items',
 }
 
 export enum TYPE_FILE {
@@ -58,4 +62,10 @@ export enum CONSTANT {
 export enum STATUS {
     ACTIVED = 'actived',
     DELETED = 'deleted',
+}
+
+export enum ROLE_STORE {
+    OWNER = 'owner',
+    MANAGER = 'manager',
+    ASSISTANT_MANAGER = 'assistant_manager',
 }
