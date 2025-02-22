@@ -47,6 +47,7 @@ export enum OPERATOR {
     IS_NOT_EMPTY = 'ISNOTEMPTY',
     IS_NOT = 'ISNOT',
     IS_NOT_IN = 'ISNOTIN',
+    EQ = 'EQ',
 }
 
 export enum CONSTANT {

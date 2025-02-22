@@ -21,6 +21,7 @@ import { CloudinaryProvider } from 'src/configs/cloudinary.config';
     MediasService,
     CloudinaryProvider
   ],
-  controllers: [MediasController]
+  controllers: [MediasController],
+  exports: [MediasService]
 })
 export class MediasModule { }

@@ -53,4 +53,8 @@ export class MediasService {
             );
         });
     }
+
+    async getMediaById(id: string) {
+        return await this.fileRepository.findOne({ where: { id } });
+    }
 }

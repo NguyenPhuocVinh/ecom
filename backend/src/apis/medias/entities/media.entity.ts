@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import slugify from 'slugify';
 import { CategoryEntity } from 'src/apis/categories/entities/category.entity';
 import { UserEntity } from 'src/apis/users/entities/users.entity';
 import { ENTITY_NAME } from 'src/common/constants/enum';
@@ -73,13 +74,13 @@ export class FileEntity extends BaseEntity {
     @ManyToOne(() => UserEntity, (user) => user.cover, { nullable: true })
     user: UserEntity;
 
-    @OneToOne(() => CategoryEntity, (category) => category.cover, { nullable: true })
-    category: CategoryEntity;
+    @OneToMany(() => CategoryEntity, (category) => category.cover, { nullable: true })
+    categories: CategoryEntity;
 
     @BeforeInsert()
     async generateAlt() {
         if (!this.alt) {
-            this.alt = _.kebabCase(this.title);
+            this.alt = slugify(this.title, { lower: true });
         }
     }
 }

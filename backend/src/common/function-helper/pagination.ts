@@ -16,10 +16,8 @@ export async function paginate<T>(
         hasPrevPage: boolean;
     }
 }> {
-    // Áp dụng phân trang trên query builder
     qb.skip((currentPage - 1) * perPage).take(perPage);
 
-    // Lấy data và tổng số bản ghi từ cơ sở dữ liệu
     const [data, total] = await qb.getManyAndCount();
 
     const totalPages = Math.ceil(total / perPage);

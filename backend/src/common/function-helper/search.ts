@@ -40,9 +40,8 @@ export function buildConditionOptions(search: Record<string, string>): Condition
 export function applyConditionOptions<T>(
     qb: SelectQueryBuilder<T>,
     conditions: ConditionOption[],
-    defaultAlias: string = 'product'
+    defaultAlias: string
 ): SelectQueryBuilder<T> {
-    console.log("🚀 ~ conditions:", conditions)
     conditions.forEach(cond => {
         // Sử dụng alias từ condition, nếu không có thì dùng defaultAlias
         const alias = cond.alias || defaultAlias;
@@ -91,7 +90,6 @@ export function applyConditionOptions<T>(
             case OPERATOR.NOT.toLowerCase():
                 qb.andWhere(`${alias}.${cond.key} ${cond.operator.toLowerCase() === OPERATOR.NOT.toLowerCase() ? '!=' : '='} :${paramKey}`, { [paramKey]: cond.value });
                 break;
-            case 'eq':
             default:
                 qb.andWhere(`${alias}.${cond.key} = :${paramKey}`, { [paramKey]: cond.value });
         }

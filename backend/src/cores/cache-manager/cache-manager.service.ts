@@ -28,6 +28,22 @@ export class CacheManagerService {
         }
     }
 
+    async generateCacheKeyForFindOne(
+        routerName: string,
+        functionName: string,
+        id: string,
+        locale?: string,
+        options?: Object,
+    ) {
+        try {
+            const key = `${appConfig.appName
+                }:${routerName}:${functionName}-${locale}-${id}-${encodeURIComponent(JSON.stringify(options))}`;
+            return key.toString();
+        } catch (error) {
+            console.log('error', error);
+        }
+    }
+
     async getCache(key: string) {
         try {
             const data = await this.cacheManager.get(key);
