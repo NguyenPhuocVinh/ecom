@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Authorize } from 'src/cores/decorators/auth/authorization.decorator';
 import { CreateProductDto } from './entities/dto/create-product.dto';
@@ -16,5 +16,13 @@ export class ProductsController {
         @Body() createProductDto: any,
     ) {
         return await this.productsService.create(createProductDto, req);
+    }
+
+    @Get(':id')
+    async getProductDetail(
+        @Req() req: any,
+        @Param('id') id: string,
+    ) {
+        return await this.productsService.getDetail(id);
     }
 }

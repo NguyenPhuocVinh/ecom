@@ -4,12 +4,14 @@ import { StoresService } from './stores.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StoreEntity } from './entities/store.entity';
 import { InventoryEntity } from '../inventories/entities/inventory.entity';
+import { StoreManagerEntity } from './entities/store-manager.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       StoreEntity,
-      InventoryEntity
+      InventoryEntity,
+      StoreManagerEntity
     ])
   ],
   controllers: [StoresController],

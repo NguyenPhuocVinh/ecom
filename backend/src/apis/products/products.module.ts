@@ -8,6 +8,8 @@ import { InventoryEntity } from '../inventories/entities/inventory.entity';
 import { PriceEntity } from './entities/price.entity';
 import { CategoryEntity } from '../categories/entities/category.entity';
 import { StoreEntity } from '../stores/entities/store.entity';
+import { AttributeEntity } from './entities/atribute.entity';
+import { VariantEntity } from './entities/variant.entity';
 
 @Module({
   imports: [
@@ -16,7 +18,9 @@ import { StoreEntity } from '../stores/entities/store.entity';
       PriceEntity,
       InventoryEntity,
       CategoryEntity,
-      StoreEntity
+      StoreEntity,
+      AttributeEntity,
+      VariantEntity
     ]),
     InventoriesModule
   ],

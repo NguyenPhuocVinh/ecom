@@ -7,6 +7,7 @@ import { CreateStoreDto } from './entities/dto/create-store.dto';
 import slugify from 'slugify';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { typeormTransactionHandler } from 'src/common/function-helper/transaction';
+import { StoreManagerEntity } from './entities/store-manager.entity';
 
 @Injectable()
 export class StoresService {
@@ -18,6 +19,9 @@ export class StoresService {
 
         @InjectRepository(InventoryEntity)
         private readonly inventoryRepository: Repository<InventoryEntity>,
+
+        @InjectRepository(StoreManagerEntity)
+        private readonly storeManagerRepository: Repository<StoreManagerEntity>,
 
         @InjectDataSource() private readonly dataSource: DataSource,
     ) { }
@@ -34,9 +38,14 @@ export class StoresService {
                 const newStore = this.storeRepository.create({
                     ...createStoreDto,
                     slug,
-                    managers: [{ user: createdBy.id, role: 'owner' }],
                 });
                 await manager.save(StoreEntity, newStore);
+
+                const managerStore = this.storeManagerRepository.create({
+                    user: createdBy,
+                    store: newStore,
+                });
+                await manager.save(StoreManagerEntity, managerStore);
             },
             (error) => {
                 throw error;

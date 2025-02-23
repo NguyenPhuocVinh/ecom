@@ -19,6 +19,9 @@ export enum ENTITY_NAME {
     PRICE = 'prices',
     STORE = 'stores',
     INVENTORY_ITEM = 'inventory_items',
+    STORE_MANAGER = 'store_managers',
+    ATTRIBUTE = 'attributes',
+    VARIANT = 'variants',
 }
 
 export enum TYPE_FILE {

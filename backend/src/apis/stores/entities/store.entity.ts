@@ -4,11 +4,7 @@ import { ProductEntity } from "src/apis/products/entities/product.entity";
 import { ENTITY_NAME, ROLE_STORE } from "src/common/constants/enum";
 import { BaseEntity } from "src/cores/entities/base.entity";
 import { BeforeInsert, Column, Entity, OneToMany, OneToOne } from "typeorm";
-
-class Manager {
-    user: string; // Lưu ID dưới dạng string
-    role: string;
-}
+import { StoreManagerEntity } from "./store-manager.entity";
 
 @Entity({ name: ENTITY_NAME.STORE })
 export class StoreEntity extends BaseEntity {
@@ -24,9 +20,6 @@ export class StoreEntity extends BaseEntity {
     @Column()
     phone: string;
 
-    @Column({ type: 'json', nullable: true })
-    managers: Manager[];
-
     @Column({ default: ROLE_STORE.OWNER })
     transferPermission: string;
 
@@ -41,6 +34,9 @@ export class StoreEntity extends BaseEntity {
 
     @OneToMany(() => ProductEntity, (product) => product.store)
     products: ProductEntity[];
+
+    @OneToMany(() => StoreManagerEntity, (storeManager) => storeManager.store)
+    users: StoreManagerEntity[];
 
     @BeforeInsert()
     async beforeInsert() {

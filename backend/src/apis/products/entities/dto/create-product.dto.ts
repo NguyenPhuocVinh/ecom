@@ -1,6 +1,68 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString, IsUUID, IsNumber } from 'class-validator';
 
+
+
+class VariantDto {
+    @ApiProperty({
+        description: 'thông tin biến thể',
+        example: 'Color, Size',
+    })
+    @IsNotEmpty()
+    @IsUUID()
+    key: string;
+
+    @ApiProperty({
+        description: 'Giá trị của biến thể',
+        example: 'Black',
+    })
+    @IsNotEmpty()
+    @IsString()
+    value: string;
+
+    @ApiProperty({
+        description: 'Giá của sản phẩm',
+        example: 999.99,
+    })
+    @IsNotEmpty()
+    @IsString()
+    price: string;
+
+    @ApiProperty({
+        description: 'Số lượng sản phẩm',
+    })
+    @IsOptional()
+    @IsUUID()
+    quantity?: number;
+}
+
+class AttributeDto {
+    @ApiProperty({
+        description: 'thông tin thuộc tính',
+        example: 'Color, Size',
+    })
+    @IsNotEmpty()
+    @IsUUID()
+    key: string;
+
+    @ApiProperty({
+        description: 'Giá trị của thuộc tính',
+        example: 'Black',
+    })
+    @IsNotEmpty()
+    @IsString()
+    value: string;
+
+    @ApiProperty({
+        description: 'Danh sách biến thể của sản phẩm',
+        type: [VariantDto],
+    })
+    @IsOptional()
+    @IsString()
+    variants: VariantDto[];
+
+}
+
 export class CreateProductDto {
     @ApiProperty({
         description: 'Tên của sản phẩm',
@@ -43,25 +105,20 @@ export class CreateProductDto {
     featuredImages?: string[];
 
     @ApiProperty({
-        description: 'Giá của sản phẩm',
-        example: 999.99,
-    })
-    @IsNotEmpty()
-    @IsString()
-    price: string;
-
-    @ApiProperty({
-        description: 'Số lượng sản phẩm',
-    })
-    @IsOptional()
-    @IsUUID()
-    quantity?: number;
-
-    @ApiProperty({
         description: 'ID của cửa hàng',
         example: 'd3f2c1a5-bd5a-4fef-87e3-2e8a6a43e2ea',
     })
     @IsOptional()
     @IsUUID()
     store: string;
+
+
+
+    @ApiProperty({
+        description: 'Danh sách thuộc tính của sản phẩm',
+        type: [AttributeDto],
+    })
+    @IsOptional()
+    @IsString()
+    attributes: AttributeDto[];
 }

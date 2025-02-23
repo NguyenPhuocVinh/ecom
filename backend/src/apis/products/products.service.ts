@@ -10,6 +10,8 @@ import { PriceEntity } from './entities/price.entity';
 import { error } from 'console';
 import { InventoryEntity } from '../inventories/entities/inventory.entity';
 import { StoreEntity } from '../stores/entities/store.entity';
+import { AttributeEntity } from './entities/atribute.entity';
+import { VariantEntity } from './entities/variant.entity';
 
 @Injectable()
 export class ProductsService {
@@ -31,6 +33,12 @@ export class ProductsService {
         @InjectRepository(StoreEntity)
         private readonly storeRepository: Repository<StoreEntity>,
 
+        @InjectRepository(AttributeEntity)
+        private readonly atributeRepository: Repository<AttributeEntity>,
+
+        @InjectRepository(VariantEntity)
+        private readonly variantRepository: Repository<VariantEntity>,
+
         @InjectDataSource() private readonly dataSource: DataSource,
     ) { }
 
@@ -42,13 +50,12 @@ export class ProductsService {
     async create(createProductDto: CreateProductDto, req: any): Promise<ProductEntity> {
         const {
             name,
-            price,
             categoryId,
             longDescription,
             shortDescription,
-            quantity,
             featuredImages,
-            store
+            store,
+            attributes,
         } = createProductDto;
 
         const category = await this.categoryRepository.findOne({ where: { id: categoryId } });
@@ -63,6 +70,7 @@ export class ProductsService {
 
         await typeormTransactionHandler(
             async (manager: EntityManager) => {
+                // Tạo ProductEntity
                 const product = this.productRepository.create({
                     name,
                     longDescription,
@@ -73,17 +81,45 @@ export class ProductsService {
                 });
                 createdProduct = await manager.save(ProductEntity, product);
 
-                const priceEntity = this.priceRepository.create({
-                    rootPrice: price,
-                    product: createdProduct,
-                });
-                await manager.save(PriceEntity, priceEntity);
+                if (attributes && attributes.length > 0) {
+                    const attributeEntities = [];
+                    for (const attrDto of attributes) {
+                        const attrEntity = this.atributeRepository.create({
+                            key: attrDto.key,
+                            value: attrDto.value,
+                            product: createdProduct,
+                        });
+                        attributeEntities.push(attrEntity);
+                    }
+                    const createdAttributes = await manager.save(AttributeEntity, attributeEntities);
 
-                const inventory = this.inventoryRepository.create({
-                    quantity,
-                    product: createdProduct,
-                });
-                await manager.save(InventoryEntity, inventory);
+                    for (let i = 0; i < attributes.length; i++) {
+                        const attrDto = attributes[i];
+                        const attrEntity = createdAttributes[i];
+                        if (attrDto.variants && attrDto.variants.length > 0) {
+                            for (const variantDto of attrDto.variants) {
+                                const priceEntity = this.priceRepository.create({
+                                    rootPrice: variantDto.price,
+                                });
+                                const createdPriceEntity = await manager.save(PriceEntity, priceEntity);
+
+                                const variantEntity = this.variantRepository.create({
+                                    key: variantDto.key,
+                                    value: variantDto.value,
+                                    price: createdPriceEntity,
+                                    attribute: attrEntity,
+                                });
+                                const createdVariant = await manager.save(VariantEntity, variantEntity);
+
+                                const inventoryEntity = this.inventoryRepository.create({
+                                    variant: createdVariant,
+                                    quantity: Number(variantDto.quantity),
+                                });
+                                await manager.save(InventoryEntity, inventoryEntity);
+                            }
+                        }
+                    }
+                }
             },
             (error) => {
                 this.logger.error('Error during product creation', error.stack);
@@ -92,18 +128,26 @@ export class ProductsService {
             this.dataSource
         );
 
-        return await this.getById(createdProduct.id);
+        return await this.productRepository.findOne({
+            where: { id: createdProduct.id },
+            relations: ['category', 'store', 'featuredImages', 'attributes', 'attributes.variants'],
+        });
     }
 
-
-    async getById(id: string): Promise<ProductEntity> {
-        const product = await this.productRepository.findOne({
-            where: { id },
-            relations: ['category', 'inventory', 'featuredImages'],
-        });
+    async getDetail(id: string): Promise<ProductEntity> {
+        const product = await this.productRepository.createQueryBuilder('product')
+            .leftJoinAndSelect('product.price', 'price')
+            .leftJoinAndSelect('product.category', 'category')
+            .leftJoinAndSelect('product.store', 'store')
+            .leftJoinAndSelect('product.attributes', 'attributes')
+            .leftJoinAndSelect('attributes.variants', 'variants')
+            .leftJoinAndSelect('variants.price', 'variantPrice')
+            .where('product.id = :id', { id })
+            .getOne();
         if (!product) {
             throw new NotFoundException(`Product with id ${id} not found`);
         }
         return product;
     }
+
 }

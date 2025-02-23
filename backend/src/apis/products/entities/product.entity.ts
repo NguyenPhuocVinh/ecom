@@ -7,6 +7,8 @@ import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOn
 import { PriceEntity } from "./price.entity";
 import { InventoryEntity } from "src/apis/inventories/entities/inventory.entity";
 import { StoreEntity } from "src/apis/stores/entities/store.entity";
+import { AttributeEntity } from "./atribute.entity";
+import { VariantEntity } from "./variant.entity";
 
 @Entity({ name: ENTITY_NAME.PRODUCT })
 export class ProductEntity extends BaseEntity {
@@ -33,9 +35,9 @@ export class ProductEntity extends BaseEntity {
     @JoinColumn()
     price: PriceEntity;
 
-    @OneToOne(() => InventoryEntity, (inventory) => inventory.product)
+    @OneToMany(() => AttributeEntity, (attribute) => attribute.product)
     @JoinColumn()
-    inventory: InventoryEntity;
+    attributes: VariantEntity[];
 
     @ManyToOne(() => StoreEntity, (store) => store.products)
     @JoinColumn()
