@@ -8,7 +8,7 @@ import { VariantEntity } from "./variant.entity";
 @Entity({ name: ENTITY_NAME.PRICE })
 export class PriceEntity extends BaseEntity {
     @Column()
-    rootPrice: string;
+    rootPrice: number;
 
     @OneToOne(() => ProductEntity, (product) => product.price)
     product: ProductEntity;

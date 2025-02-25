@@ -17,6 +17,7 @@ import { CategoriesModule } from './apis/categories/categories.module';
 import { StoresModule } from './apis/stores/stores.module';
 import { ProductsModule } from './apis/products/products.module';
 import { InventoriesModule } from './apis/inventories/inventories.module';
+import { CartsModule } from './apis/carts/carts.module';
 
 
 const { db, redis } = appConfig;
@@ -62,7 +63,8 @@ const { db, redis } = appConfig;
     StoresModule,
     ProductsModule,
     InventoriesModule,
-    CacheManagerModule
+    CacheManagerModule,
+    CartsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

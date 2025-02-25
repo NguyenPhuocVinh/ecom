@@ -8,6 +8,7 @@ import { OtpEntity } from './otp.entity';
 import { CategoryEntity } from 'src/apis/categories/entities/category.entity';
 import { StoreEntity } from 'src/apis/stores/entities/store.entity';
 import { StoreManagerEntity } from 'src/apis/stores/entities/store-manager.entity';
+import { CartEntity } from 'src/apis/carts/entities/cart.entity';
 
 @Entity({ name: ENTITY_NAME.USER })
 export class UserEntity extends BaseEntity {
@@ -58,6 +59,9 @@ export class UserEntity extends BaseEntity {
 
     @OneToMany(() => StoreManagerEntity, (storeManager) => storeManager.user)
     store: StoreManagerEntity[];
+
+    @OneToOne(() => CartEntity, (cart) => cart.user)
+    cart: CartEntity;
 
     @BeforeInsert()
     async beforeInsert() {

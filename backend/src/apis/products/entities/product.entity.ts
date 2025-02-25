@@ -9,6 +9,7 @@ import { InventoryEntity } from "src/apis/inventories/entities/inventory.entity"
 import { StoreEntity } from "src/apis/stores/entities/store.entity";
 import { AttributeEntity } from "./atribute.entity";
 import { VariantEntity } from "./variant.entity";
+import { CartItemEntity } from "src/apis/carts/entities/cart-item.entity";
 
 @Entity({ name: ENTITY_NAME.PRODUCT })
 export class ProductEntity extends BaseEntity {
@@ -45,6 +46,9 @@ export class ProductEntity extends BaseEntity {
     @ManyToOne(() => StoreEntity, (store) => store.products)
     @JoinColumn()
     store: StoreEntity;
+
+    @OneToMany(() => CartItemEntity, (item) => item.product)
+    cartItem: CartItemEntity;
 
     @BeforeInsert()
     async beforeInsert() {

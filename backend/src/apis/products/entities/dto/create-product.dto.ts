@@ -33,8 +33,8 @@ class VariantDto {
         example: 999.99,
     })
     @IsNotEmpty()
-    @IsString()
-    price: string;
+    @IsNumber()
+    price: number;
 
     @ApiProperty({
         description: 'Số lượng sản phẩm',

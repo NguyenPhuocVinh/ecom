@@ -22,6 +22,7 @@ export enum ENTITY_NAME {
     STORE_MANAGER = 'store_managers',
     ATTRIBUTE = 'attributes',
     VARIANT = 'variants',
+    CART_ITEM = 'cart_items',
 }
 
 export enum TYPE_FILE {

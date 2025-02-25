@@ -14,4 +14,7 @@ export class InventoryEntity extends BaseEntity {
 
     @Column()
     quantity: number;
+
+    @Column({ default: 0 })
+    reservedQuantity: number;
 }
