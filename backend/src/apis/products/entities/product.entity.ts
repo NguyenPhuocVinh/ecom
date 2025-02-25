@@ -1,7 +1,7 @@
 import slugify from "slugify";
 import { CategoryEntity } from "src/apis/categories/entities/category.entity";
 import { FileEntity } from "src/apis/medias/entities/media.entity";
-import { ENTITY_NAME } from "src/common/constants/enum";
+import { ENTITY_NAME, PRODUCT_STATUS } from "src/common/constants/enum";
 import { BaseEntity } from "src/cores/entities/base.entity";
 import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { PriceEntity } from "./price.entity";
@@ -28,6 +28,9 @@ export class ProductEntity extends BaseEntity {
     @Column({ nullable: true })
     shortDescription: string;
 
+    @Column({ enum: PRODUCT_STATUS, default: PRODUCT_STATUS.ACTIVED })
+    status: PRODUCT_STATUS;
+
     @OneToMany(() => FileEntity, (file) => file.product)
     featuredImages: FileEntity[];
 
@@ -37,7 +40,7 @@ export class ProductEntity extends BaseEntity {
 
     @OneToMany(() => AttributeEntity, (attribute) => attribute.product)
     @JoinColumn()
-    attributes: VariantEntity[];
+    attributes: AttributeEntity[];
 
     @ManyToOne(() => StoreEntity, (store) => store.products)
     @JoinColumn()

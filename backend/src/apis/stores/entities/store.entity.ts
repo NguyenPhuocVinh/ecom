@@ -32,6 +32,12 @@ export class StoreEntity extends BaseEntity {
     @Column({ default: ROLE_STORE.OWNER })
     destroyPermission: string;
 
+    @Column({ default: ROLE_STORE.OWNER })
+    addUserPermission: string;
+
+    @Column({ default: ROLE_STORE.OWNER })
+    removeUserPermission: string;
+
     @OneToMany(() => ProductEntity, (product) => product.store)
     products: ProductEntity[];
 

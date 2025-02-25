@@ -5,11 +5,19 @@ import { IsNotEmpty, IsOptional, IsString, IsUUID, IsNumber } from 'class-valida
 
 class VariantDto {
     @ApiProperty({
+        description: 'thông tin tra cứu',
+        example: '1',
+    })
+    @IsNotEmpty()
+    @IsString()
+    code: string;
+
+    @ApiProperty({
         description: 'thông tin biến thể',
         example: 'Color, Size',
     })
     @IsNotEmpty()
-    @IsUUID()
+    @IsString()
     key: string;
 
     @ApiProperty({
@@ -32,17 +40,25 @@ class VariantDto {
         description: 'Số lượng sản phẩm',
     })
     @IsOptional()
-    @IsUUID()
+    @IsString()
     quantity?: number;
 }
 
 class AttributeDto {
     @ApiProperty({
+        description: 'thông tin tra cứu',
+        example: '1',
+    })
+    @IsNotEmpty()
+    @IsString()
+    code: string;
+
+    @ApiProperty({
         description: 'thông tin thuộc tính',
         example: 'Color, Size',
     })
     @IsNotEmpty()
-    @IsUUID()
+    @IsString()
     key: string;
 
     @ApiProperty({

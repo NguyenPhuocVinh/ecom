@@ -5,13 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { StoreEntity } from './entities/store.entity';
 import { InventoryEntity } from '../inventories/entities/inventory.entity';
 import { StoreManagerEntity } from './entities/store-manager.entity';
+import { ProductEntity } from '../products/entities/product.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       StoreEntity,
       InventoryEntity,
-      StoreManagerEntity
+      StoreManagerEntity,
+      ProductEntity
     ])
   ],
   controllers: [StoresController],

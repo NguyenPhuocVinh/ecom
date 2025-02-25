@@ -72,3 +72,9 @@ export enum ROLE_STORE {
     MANAGER = 'manager',
     ASSISTANT_MANAGER = 'assistant_manager',
 }
+
+export enum PRODUCT_STATUS {
+    DRAFT = 'draft',
+    ACTIVED = 'actived',
+    DELETED = 'deleted',
+}

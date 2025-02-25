@@ -42,11 +42,6 @@ export class ProductsService {
         @InjectDataSource() private readonly dataSource: DataSource,
     ) { }
 
-    /* 
-        1. Tạo mới một sản phẩm
-        2. Tạo mới một giá gốc cho sản phẩm
-        3. Tạo mới một item trong kho cho sản phẩm
-    */
     async create(createProductDto: CreateProductDto, req: any): Promise<ProductEntity> {
         const {
             name,
@@ -70,7 +65,6 @@ export class ProductsService {
 
         await typeormTransactionHandler(
             async (manager: EntityManager) => {
-                // Tạo ProductEntity
                 const product = this.productRepository.create({
                     name,
                     longDescription,
@@ -85,6 +79,7 @@ export class ProductsService {
                     const attributeEntities = [];
                     for (const attrDto of attributes) {
                         const attrEntity = this.atributeRepository.create({
+                            code: attrDto.code,
                             key: attrDto.key,
                             value: attrDto.value,
                             product: createdProduct,
@@ -104,6 +99,7 @@ export class ProductsService {
                                 const createdPriceEntity = await manager.save(PriceEntity, priceEntity);
 
                                 const variantEntity = this.variantRepository.create({
+                                    code: variantDto.code,
                                     key: variantDto.key,
                                     value: variantDto.value,
                                     price: createdPriceEntity,

@@ -13,6 +13,9 @@ export class VariantEntity extends BaseEntity {
     attribute: AttributeEntity;
 
     @Column({ nullable: true })
+    code: string;
+
+    @Column({ nullable: true })
     key: string;
 
     @Column({ nullable: true })

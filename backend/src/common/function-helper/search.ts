@@ -150,6 +150,8 @@ export function fullTextSearchConfig(
     limit: number
 ): { searchTerm: string; offset: number; limit: number } | null {
     if (!fullTextSearch) return null;
+    const { searchTerm } = fullTextSearch;
+
     return {
         searchTerm: `%${fullTextSearch}%`,
         offset: (page - 1) * limit,
