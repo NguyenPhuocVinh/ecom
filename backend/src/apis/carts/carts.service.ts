@@ -1,13 +1,14 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { CartEntity } from './entities/cart.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { CartItemEntity } from './entities/cart-item.entity';
 import { typeormTransactionHandler } from 'src/common/function-helper/transaction';
 import { AddProductToCartDto } from './entities/dto/add-product.entity';
 import { ProductEntity } from '../products/entities/product.entity';
 import { InventoryEntity } from '../inventories/entities/inventory.entity';
 import { UpdateCartItemDto } from './entities/dto/update-cartItem.dto';
+import { VariantEntity } from '../products/entities/variant.entity';
 
 @Injectable()
 export class CartsService {
@@ -25,23 +26,41 @@ export class CartsService {
         @InjectRepository(InventoryEntity)
         private readonly inventoryRepository: Repository<InventoryEntity>,
 
+        @InjectRepository(VariantEntity)
+        private readonly variantRepository: Repository<VariantEntity>,
+
         @InjectDataSource() private readonly dataSource: DataSource,
 
     ) { }
 
     async createCart(user: any) {
         const newCart = this.cartRepository.create({
-            user: { id: user.id },
+            user:
+            {
+                id: user.id
+            },
             totalPrice: 0,
             totalQuantity: 0
         });
         return await this.cartRepository.save(newCart);
     }
 
-    async addProductToCart(data: AddProductToCartDto, user: any) {
+    async addProductToCart(data: AddProductToCartDto, store: string, user: any) {
         const { product, quantity } = data;
         const { productId, attribute, variant } = product;
-        const cart = await this.cartRepository.findOne({ where: { user: { id: user.id } } });
+        let cart = await this.cartRepository.findOne(
+            {
+                where: {
+                    user: {
+                        id: user.id
+                    }
+                }
+            }
+        );
+        if (!cart) {
+            cart = await this.createCart(user);
+        }
+
         const foundProduct = await this.productRepository.createQueryBuilder('product')
             .leftJoinAndSelect('product.attributes', 'attributes')
             .leftJoinAndSelect('attributes.variants', 'variants')
@@ -56,15 +75,14 @@ export class CartsService {
         const inventory = foundProduct.attributes[0].variants[0].inventory;
         const price = foundProduct.attributes[0].variants[0].price.rootPrice;
 
-        let newCart = null;
-        if (!cart) {
-            newCart = this.createCart(user);
-        }
-        typeormTransactionHandler(async (manager) => {
+
+        await typeormTransactionHandler(async (manager) => {
             const cartItem = await this.cartItemRepository.findOne({
                 where: {
-                    cart: { id: cart.id || newCart.id },
+                    cart: { id: cart.id },
                     product: { id: productId },
+                    attribute: attribute,
+                    variant: variant
                 }
             })
             if (cartItem) {
@@ -72,32 +90,59 @@ export class CartsService {
                 await manager.save(CartItemEntity, cartItem);
             } else {
                 const newCartItem = this.cartItemRepository.create({
-                    cart: { id: cart.id || newCart.id },
+                    cart: { id: cart.id },
                     product: { id: productId },
                     quantity,
-                    price
+                    price,
+                    variant,
+                    attribute
                 });
                 await manager.save(CartItemEntity, newCartItem);
             }
-            await this.inventoryRepository.update({ id: inventory.id }, { quantity: inventory.quantity - quantity, reservedQuantity: inventory.reservedQuantity + quantity });
-            await this.cartRepository.update({ id: cart.id || newCart.id }, { totalPrice: cart.totalPrice + Number(price) * quantity, totalQuantity: cart.totalQuantity + quantity });
+            // await this.inventoryRepository.update(
+            //     {
+            //         id: inventory.id
+            //     },
+            //     {
+            //         // quantity: inventory.quantity - quantity,
+            //         store: { id: store }
+            //     }
+            // );
+            await this.cartRepository.update(
+                {
+                    id: cart.id
+                },
+                {
+                    totalPrice: cart.totalPrice + Number(price) * quantity,
+                    totalQuantity: cart.totalQuantity + quantity
+                });
         },
             (error) => {
                 throw error;
             },
             this.dataSource
         )
-        return this.getCartDetail(user);
+        return await this.getCartDetail(user);
     }
 
     async getCartDetail(user: any) {
         const cart = await this.cartRepository.findOne({ where: { user: { id: user.id } } });
         if (!cart) return null;
-        const items = await this.cartItemRepository.find({ where: { cart: { id: cart.id } } });
+        const items = await this.cartItemRepository.createQueryBuilder('cartItem')
+            .where('cartItem.cartId = :cartId', { cartId: cart.id })
+            .leftJoinAndSelect('cartItem.product', 'product')
+            .leftJoinAndSelect('product.attributes', 'attributes')
+            .leftJoinAndSelect('attributes.variants', 'variants')
+            .leftJoinAndSelect('variants.inventory', 'inventory')
+            // Sử dụng cú pháp double quotes để tham chiếu đúng cột của alias "cartItem"
+            .andWhere('attributes.code = "cartItem"."attribute"')
+            .andWhere('variants.code = "cartItem"."variant"')
+            .getMany();
+
         return { ...cart, items };
     }
 
-    async updateCartItem(id: string, data: UpdateCartItemDto, user: any) {
+    async updateCartItem(id: string, data: UpdateCartItemDto, store: string, user: any) {
         const { product, quantity } = data;
         const { productId, attribute, variant } = product;
 
@@ -109,8 +154,9 @@ export class CartsService {
                 cart: { id: cart.id },
                 product: { id: productId },
             }
-        })
+        });
         if (!cartItem) throw new NotFoundException('CART_ITEM_NOT_FOUND');
+
         const foundProduct = await this.productRepository.createQueryBuilder('product')
             .leftJoinAndSelect('product.attributes', 'attributes')
             .leftJoinAndSelect('attributes.variants', 'variants')
@@ -122,17 +168,69 @@ export class CartsService {
             .getOne();
         if (!foundProduct) throw new NotFoundException('PRODUCT_NOT_FOUND');
 
-        const inventory = foundProduct.attributes[0].variants[0].inventory;
         const price = foundProduct.attributes[0].variants[0].price.rootPrice;
-        typeormTransactionHandler(async (manager) => {
-            await this.inventoryRepository.update({ id: inventory.id }, { quantity: inventory.quantity - quantity, reservedQuantity: inventory.reservedQuantity + quantity });
-            await this.cartRepository.update({ id: cart.id }, { totalPrice: cart.totalPrice + Number(price) * quantity, totalQuantity: cart.totalQuantity + quantity });
-            await manager.save(CartItemEntity, { ...cartItem, quantity: cartItem.quantity + quantity });
-        },
+
+        await typeormTransactionHandler(
+            async (manager: EntityManager) => {
+                const newQuantity = cartItem.quantity + quantity;
+                if (cartItem.attribute !== attribute || cartItem.variant !== variant) {
+                    if (newQuantity <= 0) throw new BadRequestException('CART_ITEM_NOT_FOUND');
+                    await manager.update(
+                        CartItemEntity,
+                        { id: cartItem.id },
+                        {
+                            attribute,
+                            variant,
+                            quantity,
+                            price
+                        }
+                    )
+                    await manager.update(
+                        CartEntity,
+                        { id: cart.id },
+                        {
+                            totalPrice: Number(cart.totalPrice) - Number(price) * cartItem.quantity + Number(price) * quantity,
+                            totalQuantity: cart.totalQuantity - cartItem.quantity + quantity
+                        }
+                    )
+                    return;
+                }
+                if (newQuantity <= 0) {
+                    await manager.update(
+                        CartEntity,
+                        { id: cart.id },
+                        {
+                            totalPrice: Number(cart.totalPrice) - Number(price) * cartItem.quantity,
+                            totalQuantity: cart.totalQuantity - cartItem.quantity
+                        }
+                    );
+                    await manager.delete(CartItemEntity, { id: cartItem.id });
+                    return;
+                } else {
+                    await manager.update(
+                        CartItemEntity,
+                        { id: cartItem.id },
+                        {
+                            quantity: newQuantity,
+                            price
+                        }
+                    )
+                    await manager.update(
+                        CartEntity,
+                        { id: cart.id },
+                        {
+                            totalPrice: Number(cart.totalPrice) + Number(price) * quantity,
+                            totalQuantity: cart.totalQuantity + quantity
+                        }
+                    )
+                }
+            },
             (error) => {
-                throw error;
+                this.logger.error('Error during product update in cart', error.stack);
+                throw new BadRequestException(error);
             },
             this.dataSource
-        )
+        );
+        return await this.getCartDetail(user);
     }
 }

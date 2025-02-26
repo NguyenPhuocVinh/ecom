@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString, ValidateNested } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, Min, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 export class Product {
@@ -28,5 +28,6 @@ export class AddProductToCartDto {
     @ApiProperty()
     @IsNumber()
     @IsNotEmpty()
+    @Min(0)
     quantity: number;
 }

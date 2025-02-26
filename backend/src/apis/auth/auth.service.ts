@@ -34,6 +34,7 @@ export class AuthService {
 
     async login(req: any) {
         const { user } = req;
+
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.sign(user, { secret: jwt.secret, expiresIn: jwt.expiresIn }),
             this.jwtService.sign(user, { secret: jwt.secret, expiresIn: jwt.refreshExpiresIn }),

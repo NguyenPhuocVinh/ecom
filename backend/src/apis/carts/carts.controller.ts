@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { CartsService } from './carts.service';
 import { Authorize } from 'src/cores/decorators/auth/authorization.decorator';
 import { AddProductToCartDto } from './entities/dto/add-product.entity';
@@ -17,10 +17,11 @@ export class CartsController {
         @Body() data: AddProductToCartDto
     ) {
         const user = req.user
-        return await this.cartsService.addProductToCart(data, user);
+        const store = '5265c609-517d-411f-b2e6-d9e8a53d146a';
+        return await this.cartsService.addProductToCart(data, store, user);
     }
 
-    @Post('id/update')
+    @Post(':id/updated')
     @Authorize()
     async updateCartItem(
         @Req() req: any,
@@ -28,6 +29,16 @@ export class CartsController {
         @Param('id') id: string
     ) {
         const user = req.user
-        return await this.cartsService.updateCartItem(id, data, user);
+        const store = '5265c609-517d-411f-b2e6-d9e8a53d146a';
+        return await this.cartsService.updateCartItem(id, data, store, user);
+    }
+
+    @Get(':id')
+    @Authorize()
+    async getCartDetail(
+        @Req() req: any
+    ) {
+        const user = req.user
+        return await this.cartsService.getCartDetail(user);
     }
 }

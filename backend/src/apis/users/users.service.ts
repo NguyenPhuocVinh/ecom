@@ -39,7 +39,8 @@ export class UsersService {
 
     async updateById(id: string, data: Partial<UserEntity>) {
         await this.userRepository.update(id, data);
-        return await this.userRepository.findOne({ where: { id }, relations: ['role'] });
+        const user = await this.userRepository.findOne({ where: { id }, relations: ['role', 'store'] });
+        return user
     }
 
     async forgotPassword(email: string, otp: string, req: any) {
@@ -51,7 +52,7 @@ export class UsersService {
             await this.otpRepository.update(foundOtp.id, { otp });
             return foundOtp;
         }
-        const newOtp = await this.otpRepository.create({ otp, user });
+        const newOtp = this.otpRepository.create({ otp, user });
         await this.otpRepository.save(newOtp);
         return newOtp;
     }

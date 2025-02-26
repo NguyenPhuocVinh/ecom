@@ -44,6 +44,9 @@ export class StoreEntity extends BaseEntity {
     @OneToMany(() => StoreManagerEntity, (storeManager) => storeManager.store)
     users: StoreManagerEntity[];
 
+    @OneToMany(() => InventoryEntity, (inventory) => inventory.store)
+    inventories: InventoryEntity[];
+
     @BeforeInsert()
     async beforeInsert() {
         this.slug = slugify(this.name, { lower: true });

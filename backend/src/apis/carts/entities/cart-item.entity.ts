@@ -18,4 +18,10 @@ export class CartItemEntity extends BaseEntity {
     @ManyToOne(() => ProductEntity, product => product.cartItem)
     @JoinColumn()
     product: ProductEntity;
+
+    @Column()
+    attribute: string;
+
+    @Column()
+    variant: string;
 }

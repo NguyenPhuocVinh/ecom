@@ -70,7 +70,6 @@ export class ProductsService {
                     longDescription,
                     shortDescription,
                     category,
-                    store: storeEntity,
                     featuredImages: featuredImages ? featuredImages.map((id) => ({ id })) : [],
                 });
                 createdProduct = await manager.save(ProductEntity, product);
@@ -110,6 +109,7 @@ export class ProductsService {
                                 const inventoryEntity = this.inventoryRepository.create({
                                     variant: createdVariant,
                                     quantity: Number(variantDto.quantity),
+                                    store: storeEntity,
                                 });
                                 await manager.save(InventoryEntity, inventoryEntity);
                             }
@@ -134,10 +134,11 @@ export class ProductsService {
         const product = await this.productRepository.createQueryBuilder('product')
             .leftJoinAndSelect('product.price', 'price')
             .leftJoinAndSelect('product.category', 'category')
-            .leftJoinAndSelect('product.store', 'store')
             .leftJoinAndSelect('product.attributes', 'attributes')
             .leftJoinAndSelect('attributes.variants', 'variants')
             .leftJoinAndSelect('variants.price', 'variantPrice')
+            .leftJoinAndSelect('variants.inventory', 'inventory')
+            .leftJoinAndSelect('inventory.store', 'store')
             .where('product.id = :id', { id })
             .getOne();
         if (!product) {
