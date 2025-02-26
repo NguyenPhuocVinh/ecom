@@ -18,6 +18,9 @@ import { StoresModule } from './apis/stores/stores.module';
 import { ProductsModule } from './apis/products/products.module';
 import { InventoriesModule } from './apis/inventories/inventories.module';
 import { CartsModule } from './apis/carts/carts.module';
+import { DiscountsModule } from './apis/discounts/discounts.module';
+import { CheckoutModule } from './apis/checkout/checkout.module';
+import { OrdersModule } from './apis/orders/orders.module';
 
 
 const { db, redis } = appConfig;
@@ -65,6 +68,9 @@ const { db, redis } = appConfig;
     InventoriesModule,
     CacheManagerModule,
     CartsModule,
+    DiscountsModule,
+    CheckoutModule,
+    OrdersModule
   ],
   controllers: [AppController],
   providers: [AppService],

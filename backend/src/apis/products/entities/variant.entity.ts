@@ -21,7 +21,7 @@ export class VariantEntity extends BaseEntity {
     @Column({ nullable: true })
     value: string;
 
-    @OneToMany(() => FileEntity, (file) => file.variants)
+    @OneToMany(() => FileEntity, (file) => file.id)
     @JoinColumn()
     featuredImages: FileEntity[];
 

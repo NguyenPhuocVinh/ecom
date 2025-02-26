@@ -6,6 +6,7 @@ import { StoreEntity } from './entities/store.entity';
 import { InventoryEntity } from '../inventories/entities/inventory.entity';
 import { StoreManagerEntity } from './entities/store-manager.entity';
 import { ProductEntity } from '../products/entities/product.entity';
+import { DiscountEntity } from '../discounts/entities/discounts.entity';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { ProductEntity } from '../products/entities/product.entity';
       StoreEntity,
       InventoryEntity,
       StoreManagerEntity,
-      ProductEntity
+      ProductEntity,
+      DiscountEntity
     ])
   ],
   controllers: [StoresController],

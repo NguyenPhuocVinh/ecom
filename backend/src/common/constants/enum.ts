@@ -6,7 +6,7 @@ export enum ENTITY_NAME {
     CATEGORY = 'categories',
     PRODUCT = 'products',
     ORDER = 'orders',
-    ORDER_DETAIL = 'order_details',
+    ORDER_ITEM = 'order_items',
     COMMENT = 'comments',
     TENANT = 'tenants',
     CART = 'carts',
@@ -23,6 +23,7 @@ export enum ENTITY_NAME {
     ATTRIBUTE = 'attributes',
     VARIANT = 'variants',
     CART_ITEM = 'cart_items',
+    DISCOUNT = 'discounts',
 }
 
 export enum TYPE_FILE {
@@ -78,4 +79,28 @@ export enum PRODUCT_STATUS {
     DRAFT = 'draft',
     ACTIVED = 'actived',
     DELETED = 'deleted',
+}
+
+export enum DISCOUNT_TYPE {
+    PERCENT = 'percent',
+    FIXED = 'fixed',
+}
+
+export enum DISCOUNT_STATUS {
+    ACTIVED = 'actived',
+    DELETED = 'deleted',
+}
+
+export enum DISCOUNT_CONDITION {
+    ALL = 'all',
+    MINIMUM_PURCHASE = 'minimum_purchase',
+    MINIMUM_QUANTITY = 'minimum_quantity',
+}
+
+export enum ORDER_STATUS {
+    PENDING = 'pending',
+    PROCESSING = 'processing',
+    SHIPPING = 'shipping',
+    COMPLETED = 'completed',
+    CANCELLED = 'cancelled',
 }

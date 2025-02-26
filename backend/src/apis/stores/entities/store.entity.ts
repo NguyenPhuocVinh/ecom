@@ -3,8 +3,9 @@ import { InventoryEntity } from "src/apis/inventories/entities/inventory.entity"
 import { ProductEntity } from "src/apis/products/entities/product.entity";
 import { ENTITY_NAME, ROLE_STORE } from "src/common/constants/enum";
 import { BaseEntity } from "src/cores/entities/base.entity";
-import { BeforeInsert, Column, Entity, OneToMany, OneToOne } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { StoreManagerEntity } from "./store-manager.entity";
+import { DiscountEntity } from "src/apis/discounts/entities/discounts.entity";
 
 @Entity({ name: ENTITY_NAME.STORE })
 export class StoreEntity extends BaseEntity {
@@ -46,6 +47,10 @@ export class StoreEntity extends BaseEntity {
 
     @OneToMany(() => InventoryEntity, (inventory) => inventory.store)
     inventories: InventoryEntity[];
+
+    @OneToMany(() => DiscountEntity, (discount) => discount.store)
+    @JoinColumn()
+    discounts: DiscountEntity[];
 
     @BeforeInsert()
     async beforeInsert() {

@@ -14,6 +14,7 @@ import { OPERATOR, PRODUCT_STATUS, STATUS } from 'src/common/constants/enum';
 import { applyConditionOptions } from 'src/common/function-helper/search';
 import { paginate } from 'src/common/function-helper/pagination';
 import { AddUserToStoreDto } from './entities/dto/add-user-to-store.dto';
+import { DiscountEntity } from '../discounts/entities/discounts.entity';
 
 @Injectable()
 export class StoresService {
@@ -31,6 +32,9 @@ export class StoresService {
 
         @InjectRepository(ProductEntity)
         private readonly productRepository: Repository<ProductEntity>,
+
+        @InjectRepository(DiscountEntity)
+        private readonly discountRepository: Repository<DiscountEntity>,
 
         @InjectDataSource() private readonly dataSource: DataSource,
     ) { }
@@ -172,5 +176,15 @@ export class StoresService {
         })
         await this.storeManagerRepository.save(addUser);
         return this.getUserStore(id, null, req);
+    }
+
+    async getDiscountStore(id: string, queryParams: PagingDto, req: any) {
+        const store = await this.storeRepository.findOne({ where: { id } });
+        if (!store) throw new NotFoundException('STORE_NOT_FOUND');
+        const discounts = await this.discountRepository.find({
+            where: { store: { id } },
+            relations: ['user'],
+        });
+        return discounts;
     }
 }

@@ -3,12 +3,13 @@ import { FileEntity } from 'src/apis/medias/entities/media.entity';
 import { RoleEntity } from 'src/apis/roles/entities/roles.entity';
 import { ENTITY_NAME } from 'src/common/constants/enum';
 import { BaseEntity } from 'src/cores/entities/base.entity';
-import { BeforeInsert, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { BeforeInsert, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { OtpEntity } from './otp.entity';
 import { CategoryEntity } from 'src/apis/categories/entities/category.entity';
 import { StoreEntity } from 'src/apis/stores/entities/store.entity';
 import { StoreManagerEntity } from 'src/apis/stores/entities/store-manager.entity';
 import { CartEntity } from 'src/apis/carts/entities/cart.entity';
+import { DiscountEntity } from 'src/apis/discounts/entities/discounts.entity';
 
 @Entity({ name: ENTITY_NAME.USER })
 export class UserEntity extends BaseEntity {
@@ -62,6 +63,10 @@ export class UserEntity extends BaseEntity {
 
     @OneToOne(() => CartEntity, (cart) => cart.user)
     cart: CartEntity;
+
+    @OneToMany(() => DiscountEntity, (discount) => discount.user)
+    @JoinColumn()
+    discounts: DiscountEntity[];
 
     @BeforeInsert()
     async beforeInsert() {
