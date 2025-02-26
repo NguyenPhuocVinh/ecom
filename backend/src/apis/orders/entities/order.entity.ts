@@ -1,6 +1,6 @@
 import { ENTITY_NAME, ORDER_STATUS } from "src/common/constants/enum";
 import { BaseEntity } from "src/cores/entities/base.entity";
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { OrderItemEntity } from "./order-item.entity";
 import { UserEntity } from "src/apis/users/entities/users.entity";
 
@@ -9,8 +9,19 @@ export class OrderEntity extends BaseEntity {
     @OneToMany(() => OrderItemEntity, item => item.order)
     items: OrderItemEntity[];
 
-    @ManyToOne(() => UserEntity, user => user.id)
+    @ManyToOne(() => UserEntity, { nullable: true })
+    @JoinColumn()
     user: UserEntity;
+
+    @Column({ type: 'jsonb' })
+    userInfo: {
+        firstName: string;
+        lastName: string;
+        fullName: string;
+        email: string;
+        shippingAddress: string;
+        phone: string;
+    };
 
     @Column()
     totalAmount: number;
@@ -20,4 +31,5 @@ export class OrderEntity extends BaseEntity {
 
     @Column({ enum: ORDER_STATUS, default: ORDER_STATUS.PENDING })
     status: ORDER_STATUS;
+
 }

@@ -10,6 +10,7 @@ import { StoreEntity } from 'src/apis/stores/entities/store.entity';
 import { StoreManagerEntity } from 'src/apis/stores/entities/store-manager.entity';
 import { CartEntity } from 'src/apis/carts/entities/cart.entity';
 import { DiscountEntity } from 'src/apis/discounts/entities/discounts.entity';
+import { OrderEntity } from 'src/apis/orders/entities/order.entity';
 
 @Entity({ name: ENTITY_NAME.USER })
 export class UserEntity extends BaseEntity {
@@ -67,6 +68,10 @@ export class UserEntity extends BaseEntity {
     @OneToMany(() => DiscountEntity, (discount) => discount.user)
     @JoinColumn()
     discounts: DiscountEntity[];
+
+    // @OneToMany(() => OrderEntity, order => order.user)
+    // orders: OrderEntity[];
+
 
     @BeforeInsert()
     async beforeInsert() {

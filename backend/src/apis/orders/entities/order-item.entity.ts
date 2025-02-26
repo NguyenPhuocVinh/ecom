@@ -10,7 +10,7 @@ export class OrderItemEntity extends BaseEntity {
     @ManyToOne(() => OrderEntity, order => order.items)
     order: OrderEntity;
 
-    @OneToOne(() => ProductEntity, product => product.id)
+    @ManyToOne(() => ProductEntity, product => product.id)
     @JoinColumn()
     product: ProductEntity;
 
@@ -21,13 +21,13 @@ export class OrderItemEntity extends BaseEntity {
         featuredImage: string;
         longDescription?: string;
         shortDescription?: string;
-        attributes?: {
+        attribute?: {
             key: string;
             value: string;
             variant?: {
                 key: string;
                 value: string;
             };
-        }[];
+        };
     };
 }

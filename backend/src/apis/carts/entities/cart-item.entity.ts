@@ -15,7 +15,7 @@ export class CartItemEntity extends BaseEntity {
     @Column()
     quantity: number;
 
-    @ManyToOne(() => ProductEntity, product => product.cartItem)
+    @ManyToOne(() => ProductEntity, product => product.id)
     @JoinColumn()
     product: ProductEntity;
 
