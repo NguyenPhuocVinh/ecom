@@ -21,12 +21,12 @@ export class VariantEntity extends BaseEntity {
     @Column({ nullable: true })
     value: string;
 
-    @OneToMany(() => FileEntity, (file) => file.id)
+    @OneToMany(() => FileEntity, (file) => file.variant)
     @JoinColumn()
     featuredImages: FileEntity[];
 
-    @OneToOne(() => InventoryEntity, (inventory) => inventory.variant)
-    inventory: InventoryEntity;
+    @OneToMany(() => InventoryEntity, (inventory) => inventory.variant)
+    inventories: InventoryEntity[];
 
     @ManyToOne(() => PriceEntity, (price) => price.variants)
     @JoinColumn()

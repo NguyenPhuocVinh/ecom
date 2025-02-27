@@ -38,12 +38,23 @@ export class OrdersService {
     ) { }
 
     async createOrder(data: CreateOrderDto, user: any) {
-        const { cartId, items, firstName, lastName, shippingAddress, phone } = data;
+        const { cartId, items, firstName, lastName, shippingAddress, phone, storeId } = data;
 
         const cart = await this.cartRepository.findOne({
-            where: { id: cartId, user: user ? { id: user.id } : undefined },
-            relations: ['items', 'items.product', 'items.product.attributes', 'items.product.attributes.variants'],
+            where: {
+                id: cartId,
+                ...(user && { user: { id: user.id } })
+            },
+            relations: [
+                'items',
+                'items.product',
+                'items.product.attributes',
+                'items.product.attributes.featuredImages',
+                'items.product.attributes.variants',
+                'items.product.attributes.variants.featuredImages',
+            ],
         });
+
 
         if (!cart) throw new BadRequestException('CAN_NOT_FIND_CART');
         if (cart.items.length === 0) throw new BadRequestException('CART_IS_EMPTY');
@@ -85,8 +96,9 @@ export class OrdersService {
                     if (!product) return null;
 
                     const attribute = product.attributes.find(attr => attr.code === cartItem.attribute);
-                    const variant = attribute?.variants.find(variant => variant.code === cartItem.variant);
-
+                    const variant = attribute?.variants.find(variant => {
+                        return variant.code === cartItem.variant
+                    })
                     return manager.create(OrderItemEntity, {
                         order,
                         product,
@@ -94,7 +106,12 @@ export class OrdersService {
                             name: product.name,
                             price: cartItem.price,
                             quantity: cartItem.quantity,
-                            featuredImage: null,
+                            featuredImage: {
+                                title: variant.featuredImages[0].title,
+                                secure_url: variant.featuredImages[0].secure_url,
+                                alt: variant.featuredImages[0].alt,
+                                url: variant.featuredImages[0].url,
+                            },
                             longDescription: product.longDescription,
                             shortDescription: product.shortDescription,
                             attribute: attribute ? {
@@ -116,23 +133,23 @@ export class OrdersService {
                         const product = cartItem.product;
                         if (!product) return;
 
-                        const updatedInventory = await manager.createQueryBuilder(ProductEntity, 'product')
-                            .leftJoinAndSelect('product.attributes', 'attributes')
-                            .leftJoinAndSelect('attributes.variants', 'variants')
-                            .leftJoinAndSelect('variants.inventory', 'inventory')
+                        const updatedInventory = await manager.createQueryBuilder(InventoryEntity, 'inventory')
+                            .select('inventory.id, inventory.quantity')
+                            .leftJoin('inventory.variant', 'variant')
+                            .leftJoin('variant.attribute', 'attribute')
+                            .leftJoin('attribute.product', 'product')
+                            .leftJoin('inventory.store', 'store')
                             .where('product.id = :productId', { productId: product.id })
-                            .andWhere('attributes.code = :attribute', { attribute: cartItem.attribute })
-                            .andWhere('variants.code = :variant', { variant: cartItem.variant })
-                            .getOne();
-
-                        const variantInventory = updatedInventory?.attributes[0]?.variants[0]?.inventory;
-                        if (!variantInventory) return;
+                            .andWhere('attribute.code = :attribute', { attribute: cartItem.attribute })
+                            .andWhere('variant.code = :variant', { variant: cartItem.variant })
+                            .andWhere('store.id = :storeId', { storeId })
+                            .getRawOne();
 
                         await manager.update(
                             InventoryEntity,
-                            variantInventory.id,
+                            updatedInventory.id,
                             {
-                                quantity: variantInventory.quantity - cartItem.quantity,
+                                quantity: updatedInventory.quantity - cartItem.quantity,
                             }
                         );
                     }),

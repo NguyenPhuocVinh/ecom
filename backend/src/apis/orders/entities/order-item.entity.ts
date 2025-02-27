@@ -18,7 +18,12 @@ export class OrderItemEntity extends BaseEntity {
     productOrder: {
         name: string;
         price: number;
-        featuredImage: string;
+        featuredImage: {
+            title: string;
+            secure_url: string;
+            alt: string;
+            url: string;
+        };
         longDescription?: string;
         shortDescription?: string;
         attribute?: {

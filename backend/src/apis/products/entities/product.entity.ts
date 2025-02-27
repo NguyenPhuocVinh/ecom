@@ -34,7 +34,9 @@ export class ProductEntity extends BaseEntity {
     status: PRODUCT_STATUS;
 
     @OneToMany(() => FileEntity, (file) => file.product)
+    @JoinColumn()
     featuredImages: FileEntity[];
+
 
     @OneToOne(() => PriceEntity, (price) => price.product)
     @JoinColumn()

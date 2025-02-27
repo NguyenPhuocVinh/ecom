@@ -85,4 +85,25 @@ export class StoresController {
         const result = await this.storesService.addUserToStore(id, data, req);
         return result;
     }
+
+    @Get()
+    // @Authorize()
+    async getAllStores(
+        @Req() req: any,
+        @Param('id') id: string,
+        @Query(new PagingDtoPipe()) queryParams: PagingDto
+    ) {
+        const cacheKey = await this.cacheManagerService.generateCacheKeyForFindAll(
+            ENTITY_NAME.STORE,
+            'getAllStores',
+            queryParams
+        )
+        const cacheData = await this.cacheManagerService.getCache(cacheKey);
+        if (cacheData) {
+            return cacheData;
+        }
+        const data = await this.storesService.getAllStores();
+        await this.cacheManagerService.setCache(cacheKey, data);
+        return data;
+    }
 }

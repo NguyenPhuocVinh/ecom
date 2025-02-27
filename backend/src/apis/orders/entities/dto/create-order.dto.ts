@@ -7,15 +7,14 @@ export class CreateOrderDto {
     @IsOptional()
     cartId?: string;
 
-    // @ApiProperty({ description: "Danh sách ID sản phẩm" })
-    // @IsArray()
-    // @IsString({ each: true }) // Chấp nhận mảng string
-    // @ArrayNotEmpty()
-    // products: string[];
+    @ApiPropertyOptional({ description: "ID cửa hàng" })
+    @IsUUID()
+    @IsOptional()
+    storeId?: string
 
     @ApiProperty({ description: "Danh sách item trong giỏ hàng" })
     @IsArray()
-    @IsString({ each: true }) // Chấp nhận mảng string
+    @IsString({ each: true })
     @ArrayNotEmpty()
     items: string[];
 

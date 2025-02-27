@@ -80,14 +80,14 @@ export class FileEntity extends BaseEntity {
     @OneToMany(() => CategoryEntity, (category) => category.cover, { nullable: true })
     categories: CategoryEntity;
 
-    @ManyToOne(() => ProductEntity, product => product.featuredImages, { nullable: true })
+    @ManyToOne(() => ProductEntity, (product) => product.featuredImages, { nullable: true })
     product: ProductEntity;
 
-    @OneToMany(() => AttributeEntity, (attribute) => attribute.featuredImages, { nullable: true })
-    atributes: AttributeEntity[];
+    @ManyToOne(() => AttributeEntity, (attribute) => attribute.featuredImages, { nullable: true })
+    attribute: AttributeEntity;
 
-    @OneToMany(() => VariantEntity, (variant) => variant.featuredImages, { nullable: true })
-    variants: AttributeEntity[];
+    @ManyToOne(() => VariantEntity, (variant) => variant.featuredImages, { nullable: true })
+    variant: VariantEntity;
 
     @BeforeInsert()
     async generateAlt() {

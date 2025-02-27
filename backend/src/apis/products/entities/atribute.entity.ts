@@ -19,7 +19,7 @@ export class AttributeEntity extends BaseEntity {
     @Column()
     value: string;
 
-    @OneToMany(() => FileEntity, (file) => file.atributes)
+    @OneToMany(() => FileEntity, (file) => file.attribute)
     @JoinColumn()
     featuredImages: FileEntity[];
 

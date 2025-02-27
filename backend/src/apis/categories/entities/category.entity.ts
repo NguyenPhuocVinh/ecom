@@ -26,7 +26,7 @@ export class CategoryEntity extends BaseEntity {
     @OneToMany(() => ProductEntity, (product) => product.category)
     products: ProductEntity[];
 
-    @ManyToOne(() => FileEntity, (file) => file.categories, { nullable: true })
+    @ManyToOne(() => FileEntity, (file) => file.id, { nullable: true })
     @JoinColumn()
     cover: FileEntity;
 

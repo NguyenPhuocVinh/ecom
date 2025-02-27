@@ -1,9 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsUUID, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID, IsNumber, IsArray, ArrayNotEmpty } from 'class-validator';
 
 
 
 class VariantDto {
+    @ApiProperty({
+        description: 'ID của hình ảnh đại diện cho sản phẩm',
+        example: 'd3f2c1a5-bd5a-4fef-87e3-2e8a6a43e2ea',
+    })
+    @IsOptional()
+    @IsUUID()
+    featuredImages?: string[];
+
     @ApiProperty({
         description: 'thông tin tra cứu',
         example: '1',
@@ -77,6 +85,14 @@ class AttributeDto {
     @IsString()
     variants: VariantDto[];
 
+    @ApiProperty({
+        description: 'ID của hình ảnh đại diện cho sản phẩm',
+        example: 'd3f2c1a5-bd5a-4fef-87e3-2e8a6a43e2ea',
+    })
+    @IsOptional()
+    @IsUUID()
+    featuredImages?: string[];
+
 }
 
 export class CreateProductDto {
@@ -124,11 +140,10 @@ export class CreateProductDto {
         description: 'ID của cửa hàng',
         example: 'd3f2c1a5-bd5a-4fef-87e3-2e8a6a43e2ea',
     })
-    @IsOptional()
-    @IsUUID()
-    store: string;
-
-
+    @IsArray()
+    @IsString({ each: true })
+    @ArrayNotEmpty()
+    stores: string[];
 
     @ApiProperty({
         description: 'Danh sách thuộc tính của sản phẩm',

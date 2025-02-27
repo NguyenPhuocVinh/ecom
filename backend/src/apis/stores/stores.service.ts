@@ -187,4 +187,8 @@ export class StoresService {
         });
         return discounts;
     }
+
+    async getAllStores() {
+        return await this.storeRepository.find();
+    }
 }

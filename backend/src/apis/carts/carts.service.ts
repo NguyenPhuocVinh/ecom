@@ -64,7 +64,6 @@ export class CartsService {
         const foundProduct = await this.productRepository.createQueryBuilder('product')
             .leftJoinAndSelect('product.attributes', 'attributes')
             .leftJoinAndSelect('attributes.variants', 'variants')
-            .leftJoinAndSelect('variants.inventory', 'inventory')
             .leftJoinAndSelect('variants.price', 'price')
             .where('product.id = :id', { id: productId })
             .andWhere('attributes.code = :attrCode', { attrCode: attribute })
@@ -72,7 +71,6 @@ export class CartsService {
             .getOne();
         if (!foundProduct) throw new NotFoundException('PRODUCT_NOT_FOUND');
 
-        const inventory = foundProduct.attributes[0].variants[0].inventory;
         const price = foundProduct.attributes[0].variants[0].price.rootPrice;
 
 
@@ -99,15 +97,6 @@ export class CartsService {
                 });
                 await manager.save(CartItemEntity, newCartItem);
             }
-            // await this.inventoryRepository.update(
-            //     {
-            //         id: inventory.id
-            //     },
-            //     {
-            //         // quantity: inventory.quantity - quantity,
-            //         store: { id: store }
-            //     }
-            // );
             await this.cartRepository.update(
                 {
                     id: cart.id
@@ -133,8 +122,7 @@ export class CartsService {
             .leftJoinAndSelect('cartItem.product', 'product')
             .leftJoinAndSelect('product.attributes', 'attributes')
             .leftJoinAndSelect('attributes.variants', 'variants')
-            .leftJoinAndSelect('variants.inventory', 'inventory')
-            // Sử dụng cú pháp double quotes để tham chiếu đúng cột của alias "cartItem"
+            .leftJoinAndSelect('variants.inventories', 'inventories')
             .andWhere('attributes.code = "cartItem"."attribute"')
             .andWhere('variants.code = "cartItem"."variant"')
             .getMany();
