@@ -40,7 +40,7 @@ export class StoresService {
     ) { }
 
     async create(createStoreDto: CreateStoreDto, createdBy: any) {
-        const { name } = createStoreDto;
+        const { name, lat, lon } = createStoreDto;
         const slug = slugify(name, { lower: true });
 
         const existStore = await this.storeRepository.findOne({ where: { slug } });
@@ -50,6 +50,8 @@ export class StoresService {
             async (manager: EntityManager) => {
                 const newStore = this.storeRepository.create({
                     ...createStoreDto,
+                    latitude: lat,
+                    longitude: lon,
                     slug,
                 });
                 await manager.save(StoreEntity, newStore);
@@ -66,9 +68,9 @@ export class StoresService {
             this.dataSource
         );
 
-        const result = await this.storeRepository.findOne({ where: { slug } });
-        if (!result) throw new BadRequestException('STORE_CREATE_FAIL');
-        return result;
+        const data = await this.storeRepository.findOne({ where: { slug } });
+        if (!data) throw new BadRequestException('STORE_CREATE_FAIL');
+        return { data };
     }
 
     async getDetail(id: string) {
@@ -78,9 +80,9 @@ export class StoresService {
         // qb.leftJoinAndSelect('store.managers', 'managers');
         qb.leftJoinAndSelect('store.products', 'products');
         qb.leftJoinAndSelect('products.price', 'price');
-        qb.leftJoinAndSelect('products.inventory', 'inventory');
         qb.where('store.id = :id', { id });
-        return await qb.getOne();
+        const data = await qb.getOne();
+        return { data }
     }
 
     async getProductStore(id: string, queryParams: PagingDto, req: any) {
@@ -188,7 +190,49 @@ export class StoresService {
         return discounts;
     }
 
-    async getAllStores() {
-        return await this.storeRepository.find();
+    async getAllStores(queryParams: PagingDto, req: any) {
+        const {
+            filterQuery,
+            fullTextSearch,
+            sort,
+            page,
+            limit
+        } = queryParams;
+        let qb = this.storeRepository.createQueryBuilder('store');
+        if (filterQuery && Array.isArray(filterQuery)) {
+            qb.where('store.status = :status', { status: STATUS.ACTIVED });
+            qb = applyConditionOptions(qb, filterQuery, 'store');
+        } else {
+            qb.where('store.status = :status', { status: STATUS.ACTIVED });
+        }
+        if (sort) {
+            Object.entries(sort).forEach(([key, order]) => {
+                qb.orderBy(`store.${key}`, order as ("ASC" | "DESC"));
+            });
+        }
+        return await paginate(qb, page, limit);
+    }
+
+    async getStoreNearest(lat: number, lon: number) {
+        const stores = await this.storeRepository.find();
+        const nearestStore = stores.reduce((prev, curr) => {
+            const prevDistance = Math.sqrt(
+                Math.pow(Number(prev.latitude) - lat, 2) + Math.pow(Number(prev.longitude) - lon, 2)
+            );
+            const currDistance = Math.sqrt(
+                Math.pow(Number(curr.latitude) - lat, 2) + Math.pow(Number(curr.longitude) - lon, 2)
+            );
+            return prevDistance < currDistance ? prev : curr;
+        });
+        return nearestStore;
+    }
+
+    async updateStore(id: string, data: any, req: any) {
+        const { name } = data;
+        const store = await this.storeRepository.findOne({ where: { id } });
+        const slug = slugify(name, { lower: true });
+        if (!store) throw new NotFoundException('STORE_NOT_FOUND');
+        await this.storeRepository.update({ id }, { ...data });
+        return await this.storeRepository.findOne({ where: { id } });
     }
 }

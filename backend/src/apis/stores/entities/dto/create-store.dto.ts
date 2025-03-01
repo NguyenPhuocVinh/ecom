@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateStoreDto {
     @ApiProperty({
@@ -25,4 +25,12 @@ export class CreateStoreDto {
     @IsNotEmpty()
     @IsString()
     phone: string;
+
+    @ApiProperty()
+    @IsOptional()
+    lat: any;
+
+    @ApiProperty()
+    @IsOptional()
+    lon: any;
 }

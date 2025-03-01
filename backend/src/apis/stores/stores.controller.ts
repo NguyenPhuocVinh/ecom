@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { StoresService } from './stores.service';
 import { CreateStoreDto } from './entities/dto/create-store.dto';
 import { Authorize } from 'src/cores/decorators/auth/authorization.decorator';
@@ -7,6 +7,7 @@ import { PagingDtoPipe } from 'src/cores/pipes/page-result.dto.pipe';
 import { CacheManagerService } from 'src/cores/cache-manager/cache-manager.service';
 import { ENTITY_NAME } from 'src/common/constants/enum';
 import { AddUserToStoreDto } from './entities/dto/add-user-to-store.dto';
+import { GetLocationDecorator } from 'src/cores/decorators/location.decorator';
 
 @Controller('stores')
 export class StoresController {
@@ -17,6 +18,7 @@ export class StoresController {
 
     @Post()
     @Authorize()
+    @GetLocationDecorator()
     async create(
         @Body() createStoreDto: CreateStoreDto,
         @Req() req: any
@@ -102,8 +104,19 @@ export class StoresController {
         if (cacheData) {
             return cacheData;
         }
-        const data = await this.storesService.getAllStores();
+        const data = await this.storesService.getAllStores(queryParams, req);
         await this.cacheManagerService.setCache(cacheKey, data);
         return data;
+    }
+
+    @Put(':id')
+    @Authorize()
+    async updateStore(
+        @Req() req: any,
+        @Body() data: any,
+        @Param('id') id: string
+    ) {
+        const result = await this.storesService.updateStore(id, data, req);
+        return result;
     }
 }

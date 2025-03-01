@@ -55,7 +55,6 @@ export class OrdersService {
             ],
         });
 
-
         if (!cart) throw new BadRequestException('CAN_NOT_FIND_CART');
         if (cart.items.length === 0) throw new BadRequestException('CART_IS_EMPTY');
 
@@ -96,9 +95,9 @@ export class OrdersService {
                     if (!product) return null;
 
                     const attribute = product.attributes.find(attr => attr.code === cartItem.attribute);
-                    const variant = attribute?.variants.find(variant => {
-                        return variant.code === cartItem.variant
-                    })
+                    const variant = attribute?.variants.find(v => v.code === cartItem.variant);
+                    console.log("🚀 ~ OrdersService ~ variant:", variant.featuredImages)
+
                     return manager.create(OrderItemEntity, {
                         order,
                         product,
@@ -107,10 +106,10 @@ export class OrdersService {
                             price: cartItem.price,
                             quantity: cartItem.quantity,
                             featuredImage: {
-                                title: variant.featuredImages[0].title,
-                                secure_url: variant.featuredImages[0].secure_url,
-                                alt: variant.featuredImages[0].alt,
-                                url: variant.featuredImages[0].url,
+                                title: variant?.featuredImages?.[0]?.title || null,
+                                secure_url: variant?.featuredImages?.[0]?.url || null,
+                                alt: variant?.featuredImages?.[0]?.alt || null,
+                                url: variant?.featuredImages?.[0]?.url || null,
                             },
                             longDescription: product.longDescription,
                             shortDescription: product.shortDescription,
@@ -164,10 +163,8 @@ export class OrdersService {
                 const remainingCartItems = await manager.find(
                     CartItemEntity,
                     {
-                        where:
-                        {
-                            cart:
-                                { id: cart.id }
+                        where: {
+                            cart: { id: cart.id }
                         }
                     }
                 );
@@ -190,7 +187,6 @@ export class OrdersService {
 
         return true;
     }
-
     async getOrderDetail(orderId: string) {
         return this.orderRepository.findOne({
             where: { id: orderId },

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stripe Payment</title>
+    <!-- Load Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Thông tin thẻ</h1>
+        <form id="payment-form">
+            <div class="form-group">
+                <label for="card-number">Số thẻ</label>
+                <div id="card-element" class="card-element">
+                    <!-- Stripe sẽ render form thẻ ở đây -->
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Ngày hết hạn</label>
+                <div class="expiry-cvc">
+                    <input type="text" id="expiry" placeholder="MM/YY" maxlength="5" class="input-field" />
+                    <input type="text" id="cvc" placeholder="CVC" maxlength="4" class="input-field" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="cardholder-name">Tên chủ thẻ</label>
+                <input type="text" id="cardholder-name" placeholder="Họ và tên" class="input-field" required />
+            </div>
+            <div class="form-group">
+                <label for="country">Quốc gia/Khu vực</label>
+                <select id="country" class="input-field" required>
+                    <option value="VN">Việt Nam</option>
+                    <option value="US">United States</option>
+                    <!-- Thêm các quốc gia khác nếu cần -->
+                </select>
+            </div>
+            <button type="submit" id="submit-btn">Thanh toán</button>
+            <div id="error-message" class="error-message"></div>
+        </form>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

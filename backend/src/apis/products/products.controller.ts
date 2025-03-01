@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Param, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Authorize } from 'src/cores/decorators/auth/authorization.decorator';
 import { CreateProductDto } from './entities/dto/create-product.dto';
+import { PagingDto } from 'src/common/dto/page-result.dto';
+import { PagingDtoPipe } from 'src/cores/pipes/page-result.dto.pipe';
 
 @Controller('products')
 export class ProductsController {
@@ -16,6 +18,14 @@ export class ProductsController {
         @Body() createProductDto: any,
     ) {
         return await this.productsService.create(createProductDto, req);
+    }
+
+    @Get()
+    async getAll(
+        @Req() req: any,
+        @Query(new PagingDtoPipe()) queryParams: PagingDto,
+    ) {
+        return await this.productsService.getAll(queryParams, req);
     }
 
     @Get(':id')

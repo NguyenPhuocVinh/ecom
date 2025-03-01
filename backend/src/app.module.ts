@@ -21,6 +21,10 @@ import { CartsModule } from './apis/carts/carts.module';
 import { DiscountsModule } from './apis/discounts/discounts.module';
 import { CheckoutModule } from './apis/checkout/checkout.module';
 import { OrdersModule } from './apis/orders/orders.module';
+import { useContainer } from 'class-validator';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { FindNearestStoreInterceptor } from './cores/interceptors/find-nearest-store.interceptor';
+import { GetLocationInterceptor } from './cores/interceptors/get-location.interceptor';
 
 
 const { db, redis } = appConfig;
@@ -70,9 +74,19 @@ const { db, redis } = appConfig;
     CartsModule,
     DiscountsModule,
     CheckoutModule,
-    OrdersModule
+    OrdersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: FindNearestStoreInterceptor
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: GetLocationInterceptor
+    }
+  ],
 })
 export class AppModule { }

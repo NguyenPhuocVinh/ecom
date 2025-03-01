@@ -24,6 +24,7 @@ export enum ENTITY_NAME {
     VARIANT = 'variants',
     CART_ITEM = 'cart_items',
     DISCOUNT = 'discounts',
+    PAYMENT = 'payments',
 }
 
 export enum TYPE_FILE {
@@ -103,4 +104,21 @@ export enum ORDER_STATUS {
     SHIPPING = 'shipping',
     COMPLETED = 'completed',
     CANCELLED = 'cancelled',
+}
+
+export enum PAYMENT_STATUS {
+    PENDING = 'pending',
+    PAID = 'paid',
+    FAILED = 'failed',
+}
+
+export enum PAYMENT_METHOD {
+    COD = 'cod',
+    STRIPE = 'stripe',
+    VN_PAY = 'vnpay',
+}
+
+export enum STORE_STATUS {
+    ACTIVED = 'actived',
+    DELETED = 'deleted',
 }

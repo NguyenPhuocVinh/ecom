@@ -40,7 +40,7 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
 
   // Khởi chạy ứng dụng
-  await app.listen(5001, '0.0.0.0');
+  await app.listen(5001, '127.0.0.1');
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 

@@ -2,6 +2,7 @@ import 'dotenv/config';
 
 export const appConfig = {
     appName: process.env.APP_NAME,
+    locale: process.env.LOCALE,
     db: {
         type: process.env.DB_TYPE as any || 'postgres',
         host: process.env.DB_HOST || 'localhost',
@@ -39,6 +40,25 @@ export const appConfig = {
         host: process.env.REDIS_HOST,
         port: parseInt(process.env.REDIS_PORT),
         password: process.env.REDIS_PASSWORD,
+    },
+    tomtom: {
+        apiKey: process.env.TOMTOM_API_KEY,
+        url: process.env.TOMTOM_URL,
+        version: process.env.TOMTOM_VERSION,
+    },
+
+    vnpay: {
+        vnp_TmnCode: process.env.VNP_TMN_CODE,
+        vnp_HashSecret: process.env.VNP_HASH_SECRET,
+        vnp_Url: process.env.VNP_URL,
+        vnp_ReturnUrl: process.env.VNP_RETURN_URL,
+        vnp_Api: process.env.VNP_API,
+        vnp_Currency: process.env.VNP_CURRENCY
+    },
+
+    stripe: {
+        secretKey: process.env.STRIPE_SECRET_KEY,
+        publicKey: process.env.STRIPE_PUBLIC_KEY,
     }
 
 }

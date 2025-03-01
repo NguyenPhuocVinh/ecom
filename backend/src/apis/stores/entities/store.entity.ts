@@ -1,9 +1,9 @@
 import slugify from "slugify";
 import { InventoryEntity } from "src/apis/inventories/entities/inventory.entity";
 import { ProductEntity } from "src/apis/products/entities/product.entity";
-import { ENTITY_NAME, ROLE_STORE } from "src/common/constants/enum";
+import { ENTITY_NAME, ROLE_STORE, STORE_STATUS } from "src/common/constants/enum";
 import { BaseEntity } from "src/cores/entities/base.entity";
-import { BeforeInsert, Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, OneToOne } from "typeorm";
+import { BeforeInsert, Column, Entity, Index, JoinColumn, ManyToMany, ManyToOne, OneToMany, OneToOne, Point } from "typeorm";
 import { StoreManagerEntity } from "./store-manager.entity";
 import { DiscountEntity } from "src/apis/discounts/entities/discounts.entity";
 
@@ -20,6 +20,12 @@ export class StoreEntity extends BaseEntity {
 
     @Column()
     phone: string;
+
+    @Column({ default: '0' })
+    longitude: string;
+
+    @Column({ default: '0' })
+    latitude: string;
 
     @Column({ default: ROLE_STORE.OWNER })
     transferPermission: string;
@@ -38,6 +44,12 @@ export class StoreEntity extends BaseEntity {
 
     @Column({ default: ROLE_STORE.OWNER })
     removeUserPermission: string;
+
+    @Column({
+        enum: STORE_STATUS,
+        default: STORE_STATUS.ACTIVED
+    })
+    status: STORE_STATUS;
 
     @OneToMany(() => ProductEntity, (product) => product.store)
     products: ProductEntity[];

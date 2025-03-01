@@ -41,9 +41,9 @@ export class CategoriesController {
 
         );
         const cacheData = await this.cacheManagerService.getCache(cacheKey);
-        if (cacheData) {
-            return cacheData;
-        }
+        // if (cacheData) {
+        //     return cacheData;
+        // }
         const result = await this.categoriesService.getAll(queryParams, req);
         await this.cacheManagerService.setCache(cacheKey, result);
         return result;
@@ -62,9 +62,9 @@ export class CategoriesController {
             user,
         );
         const cacheData = await this.cacheManagerService.getCache(cacheKey);
-        if (cacheData) {
-            return cacheData;
-        }
+        // if (cacheData) {
+        //     return cacheData;
+        // }
         const result = await this.categoriesService.getById(id);
         await this.cacheManagerService.setCache(cacheKey, result);
         return result;

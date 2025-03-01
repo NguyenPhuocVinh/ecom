@@ -13,6 +13,10 @@ import { StoreEntity } from '../stores/entities/store.entity';
 import { AttributeEntity } from './entities/atribute.entity';
 import { VariantEntity } from './entities/variant.entity';
 import { FileEntity } from '../medias/entities/media.entity';
+import { PagingDto } from 'src/common/dto/page-result.dto';
+import { OPERATOR, PRODUCT_STATUS } from 'src/common/constants/enum';
+import { applyConditionOptions } from 'src/common/function-helper/search';
+import { paginate } from 'src/common/function-helper/pagination';
 
 @Injectable()
 export class ProductsService {
@@ -188,4 +192,55 @@ export class ProductsService {
         return await this.getDetail(id);
     }
 
+    async getAll(queryParams: PagingDto, req: any) {
+        const {
+            page,
+            limit,
+            fullTextSearch,
+            sort,
+            filterQuery,
+        } = queryParams;
+        let qb = this.productRepository.createQueryBuilder('product')
+            .leftJoinAndSelect('product.store', 'store')
+            .leftJoinAndSelect('store.users', 'users')
+            .leftJoin('users.user', 'user')
+            .addSelect(['user.email', 'user.firstName', 'user.lastName', 'user.fullName'])
+            .leftJoinAndSelect('product.featuredImages', 'featuredImages')
+            .leftJoinAndSelect('product.attributes', 'attributes')
+            .leftJoinAndSelect('product.category', 'category')
+            .leftJoinAndSelect('attributes.variants', 'variants')
+            .leftJoinAndSelect('attributes.featuredImages', 'attributeImages')
+            .leftJoinAndSelect('variants.price', 'price')
+            .leftJoinAndSelect('variants.inventories', 'inventories')
+            .leftJoinAndSelect('inventories.store', 'inventoryStore')
+            .leftJoinAndSelect('variants.featuredImages', 'variantImages')
+
+        if (filterQuery && Array.isArray(filterQuery)) {
+            const hasStatus = filterQuery.some(condition => {
+                return condition.key && condition.key.toLowerCase() === 'status';
+            });
+            if (!hasStatus) {
+                filterQuery.push({ key: 'status', operator: OPERATOR.EQ, value: PRODUCT_STATUS.ACTIVED });
+            }
+            qb = applyConditionOptions(qb, filterQuery, 'product');
+        } else {
+            qb = qb.andWhere('product.status = :status', { status: PRODUCT_STATUS.ACTIVED });
+        }
+
+        if (fullTextSearch && fullTextSearch.searchTerm) {
+            console.log("🚀 ~ StoresService ~ getProductStore ~ searchTerm:", fullTextSearch.searchTerm)
+            qb.andWhere(
+                `(product.name ILIKE :fts OR product.longDescription ILIKE :fts OR product.shortDescription ILIKE :fts)`,
+                { fts: `%${fullTextSearch.searchTerm}%` }
+            );
+        }
+
+        if (sort) {
+            Object.entries(sort).forEach(([key, order]) => {
+                qb.orderBy(`product.${key}`, order as ("ASC" | "DESC"));
+            });
+        }
+
+        return await paginate(qb, page, limit);
+    }
 }
