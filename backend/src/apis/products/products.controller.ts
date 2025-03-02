@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Authorize } from 'src/cores/decorators/auth/authorization.decorator';
 import { CreateProductDto } from './entities/dto/create-product.dto';
@@ -44,5 +44,14 @@ export class ProductsController {
         @Body() data: any,
     ) {
         return await this.productsService.updateQuantity(id, data, req);
+    }
+
+    @Delete(':id')
+    @Authorize()
+    async deleteProduct(
+        @Req() req: any,
+        @Param('id') id: string,
+    ) {
+        return await this.productsService.delete(id, req);
     }
 }

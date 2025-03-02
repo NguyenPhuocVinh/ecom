@@ -8,10 +8,10 @@ import { VariantEntity } from "src/apis/products/entities/variant.entity";
 
 @Entity({ name: ENTITY_NAME.INVENTORY })
 export class InventoryEntity extends BaseEntity {
-    @ManyToOne(() => VariantEntity, (variant) => variant.inventories)
+    @ManyToOne(() => VariantEntity, (variant) => variant.inventories, { onDelete: "CASCADE" })
     variant: VariantEntity;
 
-    @ManyToOne(() => StoreEntity, (store) => store.inventories)
+    @ManyToOne(() => StoreEntity, (store) => store.inventories, { onDelete: "CASCADE" })
     store: StoreEntity;
 
     @Column({ default: 0 })

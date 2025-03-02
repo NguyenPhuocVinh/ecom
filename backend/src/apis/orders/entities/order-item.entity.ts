@@ -10,7 +10,7 @@ export class OrderItemEntity extends BaseEntity {
     @ManyToOne(() => OrderEntity, order => order.items)
     order: OrderEntity;
 
-    @ManyToOne(() => ProductEntity, product => product.id)
+    @ManyToOne(() => ProductEntity, product => product.id, { onDelete: "CASCADE" })
     @JoinColumn()
     product: ProductEntity;
 

@@ -10,7 +10,7 @@ export class StoreManagerEntity extends BaseEntity {
     @ManyToOne(() => UserEntity, user => user.store)
     user: UserEntity;
 
-    @ManyToOne(() => StoreEntity, store => store.users)
+    @ManyToOne(() => StoreEntity, store => store.users, { onDelete: "CASCADE" })
     store: StoreEntity;
 
     @Column({ default: ROLE_STORE.OWNER })

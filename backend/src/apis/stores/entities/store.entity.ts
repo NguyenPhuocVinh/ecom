@@ -51,18 +51,19 @@ export class StoreEntity extends BaseEntity {
     })
     status: STORE_STATUS;
 
-    @OneToMany(() => ProductEntity, (product) => product.store)
+    @OneToMany(() => ProductEntity, (product) => product.store, { cascade: true, onDelete: "CASCADE" })
     products: ProductEntity[];
 
-    @OneToMany(() => StoreManagerEntity, (storeManager) => storeManager.store)
+    @OneToMany(() => StoreManagerEntity, (storeManager) => storeManager.store, { cascade: true, onDelete: "CASCADE" })
     users: StoreManagerEntity[];
 
-    @OneToMany(() => InventoryEntity, (inventory) => inventory.store)
+    @OneToMany(() => InventoryEntity, (inventory) => inventory.store, { cascade: true, onDelete: "CASCADE" })
     inventories: InventoryEntity[];
 
-    @OneToMany(() => DiscountEntity, (discount) => discount.store)
+    @OneToMany(() => DiscountEntity, (discount) => discount.store, { cascade: true, onDelete: "CASCADE" })
     @JoinColumn()
     discounts: DiscountEntity[];
+
 
     @BeforeInsert()
     async beforeInsert() {

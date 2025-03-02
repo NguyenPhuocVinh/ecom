@@ -54,6 +54,50 @@ export class MediasService {
         });
     }
 
+    async uploadImages(title: string, files: Express.Multer.File[], req: any) {
+        const createdBy = req.user;
+
+        const uploadPromises = files.map(file =>
+            new Promise(async (resolve, reject) => {
+                cloudinary.uploader.upload(
+                    file.path,
+                    { resource_type: 'auto', folder: 'ecom' },
+                    async (error, result) => {
+                        if (error) {
+                            this.logger.error('Upload failed', error);
+                            reject(error);
+                        } else {
+                            this.logger.log('Upload successful');
+                            try {
+                                const media = this.fileRepository.create({
+                                    ...result,
+                                    title,  // Áp dụng chung một title
+                                    createdBy
+                                });
+                                resolve(await this.fileRepository.save(media));
+
+                                // Xóa file tạm
+                                fs.unlink(file.path, err => {
+                                    if (err) {
+                                        this.logger.error('Error deleting the file', err);
+                                    } else {
+                                        this.logger.log(`File ${file.path} deleted successfully`);
+                                    }
+                                });
+                            } catch (err) {
+                                this.logger.error('Error saving asset to the database', err);
+                                reject(err);
+                            }
+                        }
+                    }
+                );
+            })
+        );
+
+        return Promise.all(uploadPromises);
+    }
+
+
     async getMediaById(id: string) {
         return await this.fileRepository.findOne({ where: { id } });
     }

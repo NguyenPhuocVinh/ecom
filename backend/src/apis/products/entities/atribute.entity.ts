@@ -7,7 +7,7 @@ import { VariantEntity } from "./variant.entity";
 
 @Entity({ name: ENTITY_NAME.ATTRIBUTE })
 export class AttributeEntity extends BaseEntity {
-    @ManyToOne(() => ProductEntity, product => product.attributes)
+    @ManyToOne(() => ProductEntity, product => product.attributes, { onDelete: "CASCADE" })
     product: ProductEntity;
 
     @Column()

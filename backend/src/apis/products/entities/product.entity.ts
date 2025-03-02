@@ -20,8 +20,8 @@ export class ProductEntity extends BaseEntity {
     @Column()
     slug: string;
 
-    @ManyToOne(() => CategoryEntity, (category) => category.products)
-    @JoinColumn()
+    @ManyToOne(() => CategoryEntity, (category) => category.products, { nullable: true, onDelete: "SET NULL" })
+    @JoinColumn({ name: "categoryId" })
     category: CategoryEntity;
 
     @Column({ nullable: true })
@@ -33,7 +33,7 @@ export class ProductEntity extends BaseEntity {
     @Column({ enum: PRODUCT_STATUS, default: PRODUCT_STATUS.ACTIVED })
     status: PRODUCT_STATUS;
 
-    @OneToMany(() => FileEntity, (file) => file.product)
+    @OneToMany(() => FileEntity, (file) => file.product, { nullable: true, onDelete: "SET NULL" })
     @JoinColumn()
     featuredImages: FileEntity[];
 

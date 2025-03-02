@@ -9,7 +9,7 @@ import { AttributeEntity } from "./atribute.entity";
 
 @Entity({ name: ENTITY_NAME.VARIANT })
 export class VariantEntity extends BaseEntity {
-    @ManyToOne(() => AttributeEntity, attribute => attribute.variants)
+    @ManyToOne(() => AttributeEntity, attribute => attribute.variants, { onDelete: "CASCADE" })
     attribute: AttributeEntity;
 
     @Column({ nullable: true })
@@ -25,7 +25,7 @@ export class VariantEntity extends BaseEntity {
     @JoinColumn()
     featuredImages: FileEntity[];
 
-    @OneToMany(() => InventoryEntity, (inventory) => inventory.variant)
+    @OneToMany(() => InventoryEntity, (inventory) => inventory.variant, { onDelete: "CASCADE" })
     inventories: InventoryEntity[];
 
     @ManyToOne(() => PriceEntity, (price) => price.variants)

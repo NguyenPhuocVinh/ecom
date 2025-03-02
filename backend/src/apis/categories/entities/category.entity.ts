@@ -39,7 +39,7 @@ export class CategoryEntity extends BaseEntity {
 
     // Quan hệ cha-con đơn giản
     @ManyToOne(() => CategoryEntity, (category) => category.children, { nullable: true })
-    @JoinColumn({ name: 'parentId' }) // Chỉ định cột parentId trong database
+    @JoinColumn({ name: 'parentId' })
     parent: CategoryEntity;
 
     @OneToMany(() => CategoryEntity, (category) => category.parent)

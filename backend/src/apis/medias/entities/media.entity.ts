@@ -80,13 +80,13 @@ export class FileEntity extends BaseEntity {
     @OneToMany(() => CategoryEntity, (category) => category.cover, { nullable: true })
     categories: CategoryEntity;
 
-    @ManyToOne(() => ProductEntity, (product) => product.featuredImages, { nullable: true })
+    @ManyToOne(() => ProductEntity, (product) => product.featuredImages, { nullable: true, onDelete: 'SET NULL' })
     product: ProductEntity;
 
-    @ManyToOne(() => AttributeEntity, (attribute) => attribute.featuredImages, { nullable: true })
+    @ManyToOne(() => AttributeEntity, (attribute) => attribute.featuredImages, { nullable: true, onDelete: 'SET NULL' })
     attribute: AttributeEntity;
 
-    @ManyToOne(() => VariantEntity, (variant) => variant.featuredImages, { nullable: true })
+    @ManyToOne(() => VariantEntity, (variant) => variant.featuredImages, { nullable: true, onDelete: 'SET NULL' })
     variant: VariantEntity;
 
     @BeforeInsert()

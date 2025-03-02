@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { StoresService } from './stores.service';
 import { CreateStoreDto } from './entities/dto/create-store.dto';
 import { Authorize } from 'src/cores/decorators/auth/authorization.decorator';
@@ -101,9 +101,9 @@ export class StoresController {
             queryParams
         )
         const cacheData = await this.cacheManagerService.getCache(cacheKey);
-        if (cacheData) {
-            return cacheData;
-        }
+        // if (cacheData) {
+        //     return cacheData;
+        // }
         const data = await this.storesService.getAllStores(queryParams, req);
         await this.cacheManagerService.setCache(cacheKey, data);
         return data;
@@ -117,6 +117,16 @@ export class StoresController {
         @Param('id') id: string
     ) {
         const result = await this.storesService.updateStore(id, data, req);
+        return result;
+    }
+
+    @Delete(':id')
+    @Authorize()
+    async deleteStore(
+        @Req() req: any,
+        @Param('id') id: string
+    ) {
+        const result = await this.storesService.deleteStore(id, req);
         return result;
     }
 }

@@ -86,7 +86,7 @@ export class ProductsService {
                         attributes.map(async (attrDto) => {
                             const attrEntity = this.atributeRepository.create({
                                 code: attrDto.code,
-                                key: attrDto.key,
+                                key: attrDto.key.toLowerCase(),
                                 value: attrDto.value,
                                 product: createdProduct,
                                 featuredImages: attrDto.featuredImages ? attrDto.featuredImages.map((id) => ({ id })) : [],
@@ -108,7 +108,7 @@ export class ProductsService {
 
                                         const variantEntity = this.variantRepository.create({
                                             code: variantDto.code,
-                                            key: variantDto.key,
+                                            key: variantDto.key.toLowerCase(),
                                             value: variantDto.value,
                                             price: createdPriceEntity,
                                             attribute: attrEntity,
@@ -242,5 +242,14 @@ export class ProductsService {
         }
 
         return await paginate(qb, page, limit);
+    }
+
+    async delete(id: string, req: any) {
+        const product = await this.productRepository.findOne({ where: { id } });
+        if (!product) {
+            throw new NotFoundException(`Product with id ${id} not found`);
+        }
+        await this.productRepository.delete(id);
+        return product;
     }
 }

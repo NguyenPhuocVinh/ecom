@@ -235,4 +235,18 @@ export class StoresService {
         await this.storeRepository.update({ id }, { ...data });
         return await this.storeRepository.findOne({ where: { id } });
     }
+
+    async deleteStore(storeId: string, req: any) {
+        const store = await this.storeRepository.findOne({
+            where: { id: storeId },
+            relations: ["products", "users", "inventories", "discounts"],
+        });
+
+        if (!store) {
+            throw new Error("Store not found");
+        }
+
+        await this.storeRepository.remove(store);
+    }
+
 }

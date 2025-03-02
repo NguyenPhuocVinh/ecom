@@ -6,7 +6,7 @@ import { ProductEntity } from "src/apis/products/entities/product.entity";
 
 @Entity({ name: ENTITY_NAME.CART_ITEM })
 export class CartItemEntity extends BaseEntity {
-    @ManyToOne(() => CartEntity, cart => cart.items)
+    @ManyToOne(() => CartEntity, cart => cart.items, { onDelete: "CASCADE" })
     cart: CartEntity;
 
     @Column()
@@ -15,7 +15,7 @@ export class CartItemEntity extends BaseEntity {
     @Column()
     quantity: number;
 
-    @ManyToOne(() => ProductEntity, product => product.id)
+    @ManyToOne(() => ProductEntity, product => product.id, { onDelete: "CASCADE" })
     @JoinColumn()
     product: ProductEntity;
 

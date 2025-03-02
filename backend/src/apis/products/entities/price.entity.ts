@@ -13,6 +13,6 @@ export class PriceEntity extends BaseEntity {
     @OneToOne(() => ProductEntity, (product) => product.price)
     product: ProductEntity;
 
-    @OneToMany(() => VariantEntity, (variant) => variant.price)
+    @OneToMany(() => VariantEntity, (variant) => variant.price, { onDelete: "CASCADE" })
     variants: VariantEntity[];
 }
