@@ -16,7 +16,7 @@ export class MediasController {
             new ParseFilePipe({
                 validators: [
                     new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // Max 5MB
-                    new FileTypeValidator({ fileType: /image\/(jpeg|png|jpg)/ }),
+                    new FileTypeValidator({ fileType: /image\/(jpeg|png|jpg|webp)/ }),
                 ],
             }),
         )
@@ -35,7 +35,7 @@ export class MediasController {
             new ParseFilePipe({
                 validators: [
                     new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
-                    new FileTypeValidator({ fileType: /image\/(jpeg|png|jpg)/ }),
+                    new FileTypeValidator({ fileType: /image\/(jpeg|png|jpg|webp)/ }),
                 ],
             }),
         )

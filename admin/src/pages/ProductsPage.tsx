@@ -4,10 +4,9 @@ import { useApi } from '@/hooks/useApi';
 import { Button } from '@/components/ui/button';
 import ProductFilterModal from '@/components/products/ProductFilterModal';
 import AddNewProductModal from '@/components/products/AddNewProductModal';
-// import UpdateProductModal from '@/components/products/UpdateProductModal'; // Giả sử sẽ tạo sau
+import UpdateProductModal from '@/components/products/UpdateProductModal';
 import { CreateProductDto } from '@/lib/enum';
 import { toast } from 'sonner';
-import { log } from 'console';
 
 export default function ProductsPage() {
     const { loading, error, data, fetchApi } = useApi();
@@ -272,32 +271,25 @@ export default function ProductsPage() {
                 />
             )}
 
-            {/* {showUpdateModal && selectedProduct && (
+            {showUpdateModal && selectedProduct && (
                 <UpdateProductModal
                     open={showUpdateModal}
-                    onOpenChange={setShowUpdateModal}
-                    onSave={handleUpdateProduct}
-                    product={selectedProduct}
-                    initialFilters={{
-                        name: selectedProduct.name,
-                        categoryId: selectedProduct.categoryId,
-                        longDescription: selectedProduct.longDescription || '',
-                        shortDescription: selectedProduct.shortDescription || '',
-                        featuredImages: selectedProduct.featuredImages || [],
-                        stores: selectedProduct.stores || [],
-                        attributes: selectedProduct.attributes || [],
+                    onOpenChange={(open) => {
+                        setShowUpdateModal(open);
+                        if (!open) setSelectedProduct(null);
                     }}
+                    onUpdate={handleUpdateProduct}
+                    product={selectedProduct}
                 />
-            )} */}
-
+            )}
 
             {showDeleteConfirm && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center">
                     <div className="absolute inset-0 bg-black opacity-50" onClick={() => setShowDeleteConfirm(null)} />
                     <div className="relative bg-white p-6 rounded-lg shadow-xl w-96">
-                        <h3 className="text-lg font-bold mb-4">Xác nhận xóa danh mục</h3>
+                        <h3 className="text-lg font-bold mb-4">Xác nhận xóa sản phẩm</h3>
                         <p className="text-gray-700 mb-6">
-                            Bạn có chắc chắn muốn xóa danh mục này không? Hành động này không thể hoàn tác.
+                            Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác.
                         </p>
                         <div className="flex justify-end space-x-2">
                             <Button className="hover:cursor-pointer" onClick={() => setShowDeleteConfirm(null)}>

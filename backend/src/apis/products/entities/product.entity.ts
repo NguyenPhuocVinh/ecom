@@ -53,6 +53,8 @@ export class ProductEntity extends BaseEntity {
     @OneToMany(() => CartItemEntity, (item) => item.product)
     cartItem: CartItemEntity;
 
+    @Column({ default: 0 })
+    viewCount: number;
 
     @BeforeInsert()
     async beforeInsert() {

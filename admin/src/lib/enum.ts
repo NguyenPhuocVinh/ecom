@@ -78,6 +78,7 @@ export interface AttributeDto {
 }
 
 export interface CreateProductDto {
+    id?: string;
     name: string;
     categoryId: string;
     longDescription?: string;

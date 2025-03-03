@@ -166,6 +166,8 @@ export class ProductsService {
         if (!product) {
             throw new NotFoundException(`Product with id ${id} not found`);
         }
+
+        await this.productRepository.update(id, { viewCount: product.viewCount + 1 });
         return product;
     }
 
