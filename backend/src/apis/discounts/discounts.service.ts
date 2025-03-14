@@ -55,7 +55,7 @@ export class DiscountsService {
             if (!hasStatus) {
                 filterQuery.push({ key: 'status', operator: OPERATOR.EQ, value: DISCOUNT_STATUS.ACTIVED });
             }
-            qb = applyConditionOptions(qb, filterQuery, 'discount');
+            qb = applyConditionOptions(qb, { and: filterQuery, or: [] }, 'discount');
         } else {
             qb = qb.andWhere('discount.status = :status', { status: DISCOUNT_STATUS.ACTIVED });
         }

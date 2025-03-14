@@ -18,7 +18,7 @@ export class PagingDtoPipe implements PipeTransform {
             search,
             select = null,
             sort = '-createdAt',
-            search_type = 'and',
+            searchType = 'and',
             fullTextSearch,
             self_questions,
         } = value;
@@ -32,7 +32,7 @@ export class PagingDtoPipe implements PipeTransform {
             page: Number(page),
             limit: parsedLimit,
             sort: sortConfig(sort),
-            search_type,
+            searchType,
             filterQuery: conditions,
             select: searchConfigSelect(select),
             fullTextSearch: fullTextSearchConfig(fullTextSearch, Number(page), Number(parsedLimit)),

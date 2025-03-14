@@ -47,7 +47,7 @@ export class ProductsService {
         @InjectDataSource() private readonly dataSource: DataSource,
     ) { }
 
-    async create(createProductDto: CreateProductDto, req: any): Promise<ProductEntity> {
+    async create(createProductDto: CreateProductDto, req: any) {
         const {
             name,
             categoryId,
@@ -145,7 +145,7 @@ export class ProductsService {
         return await this.getDetail(createdProduct.id);
     }
 
-    async getDetail(id: string): Promise<ProductEntity> {
+    async getDetail(id: string) {
         const product = await this.productRepository.createQueryBuilder('product')
             .leftJoinAndSelect('product.price', 'price')
             .leftJoinAndSelect('product.category', 'category')
@@ -168,7 +168,7 @@ export class ProductsService {
         }
 
         await this.productRepository.update(id, { viewCount: product.viewCount + 1 });
-        return product;
+        return { data: product };
     }
 
     async updateQuantity(id: string, data: any, req: any) {
@@ -195,53 +195,88 @@ export class ProductsService {
     }
 
     async getAll(queryParams: PagingDto, req: any) {
-        const {
-            page,
-            limit,
-            fullTextSearch,
-            sort,
-            filterQuery,
-        } = queryParams;
+        const { page, limit, fullTextSearch, sort, filterQuery, searchType } = queryParams;
+
         let qb = this.productRepository.createQueryBuilder('product')
-            .leftJoinAndSelect('product.store', 'store')
-            .leftJoinAndSelect('store.users', 'users')
-            .leftJoin('users.user', 'user')
-            .addSelect(['user.email', 'user.firstName', 'user.lastName', 'user.fullName'])
-            .leftJoinAndSelect('product.featuredImages', 'featuredImages')
+            .leftJoin('product.featuredImages', 'featuredImages')
+            .addSelect([
+                'featuredImages.id',
+                'featuredImages.secure_url',
+                'featuredImages.url',
+                'featuredImages.title',
+                'featuredImages.alt'
+            ])
             .leftJoinAndSelect('product.attributes', 'attributes')
             .leftJoinAndSelect('product.category', 'category')
+            .leftJoinAndSelect('category.parent', 'parentCategory')
             .leftJoinAndSelect('attributes.variants', 'variants')
-            .leftJoinAndSelect('attributes.featuredImages', 'attributeImages')
+            .leftJoin('attributes.featuredImages', 'attributeImages')
+            .addSelect([
+                'attributeImages.id',
+                'attributeImages.secure_url',
+                'attributeImages.url',
+                'attributeImages.title',
+                'attributeImages.alt'
+            ])
             .leftJoinAndSelect('variants.price', 'price')
             .leftJoinAndSelect('variants.inventories', 'inventories')
             .leftJoinAndSelect('inventories.store', 'inventoryStore')
-            .leftJoinAndSelect('variants.featuredImages', 'variantImages')
+            .leftJoin('variants.featuredImages', 'variantImages')
+            .addSelect([
+                'variantImages.id',
+                'variantImages.secure_url',
+                'variantImages.url',
+                'variantImages.title',
+                'variantImages.alt'
+            ]);
 
         if (filterQuery && Array.isArray(filterQuery)) {
-            const hasStatus = filterQuery.some(condition => {
-                return condition.key && condition.key.toLowerCase() === 'status';
-            });
-            if (!hasStatus) {
-                filterQuery.push({ key: 'status', operator: OPERATOR.EQ, value: PRODUCT_STATUS.ACTIVED });
+            const categoryFilterIndex = filterQuery.findIndex(
+                condition => condition.alias === 'category'
+            );
+            if (categoryFilterIndex > -1) {
+                const [categoryFilter] = filterQuery.splice(categoryFilterIndex, 1);
+                qb = qb.andWhere(
+                    'category.id = :categoryId OR parentCategory.id = :categoryId',
+                    { categoryId: categoryFilter.value }
+                );
             }
-            qb = applyConditionOptions(qb, filterQuery, 'product');
+
+            // Đảm bảo áp dụng điều kiện status nếu chưa có
+            const hasStatus = filterQuery.some(
+                condition => condition.key?.toLowerCase() === 'status'
+            );
+            if (!hasStatus) {
+                filterQuery.push({
+                    key: 'status',
+                    operator: OPERATOR.EQ,
+                    value: PRODUCT_STATUS.ACTIVED
+                });
+            }
+
+            // Áp dụng các điều kiện còn lại từ filterQuery
+            qb = applyConditionOptions(qb, { and: filterQuery, or: [] }, 'product');
         } else {
-            qb = qb.andWhere('product.status = :status', { status: PRODUCT_STATUS.ACTIVED });
+            qb = qb.andWhere('product.status = :status', {
+                status: PRODUCT_STATUS.ACTIVED
+            });
         }
 
-        if (fullTextSearch && fullTextSearch.searchTerm) {
-            console.log("🚀 ~ StoresService ~ getProductStore ~ searchTerm:", fullTextSearch.searchTerm)
+        // Full text search
+        if (fullTextSearch?.searchTerm) {
             qb.andWhere(
                 `(product.name ILIKE :fts OR product.longDescription ILIKE :fts OR product.shortDescription ILIKE :fts)`,
                 { fts: `%${fullTextSearch.searchTerm}%` }
             );
         }
 
+        // Sắp xếp
         if (sort) {
             Object.entries(sort).forEach(([key, order]) => {
-                qb.orderBy(`product.${key}`, order as ("ASC" | "DESC"));
+                qb.orderBy(`product.${key}`, order as 'ASC' | 'DESC');
             });
         }
+
 
         return await paginate(qb, page, limit);
     }

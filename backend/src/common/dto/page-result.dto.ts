@@ -17,7 +17,7 @@ export class PagingDto {
 
     @IsString()
     @IsOptional()
-    search_type: string;
+    searchType: string;
 
     @IsOptional()
     limit?: number;

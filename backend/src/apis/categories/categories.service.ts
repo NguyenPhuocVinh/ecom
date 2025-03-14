@@ -41,7 +41,8 @@ export class CategoriesService {
             slug,
         });
 
-        return await this.categoryRepository.save(newCategory);
+        const data = await this.categoryRepository.save(newCategory);
+        return { data };
     }
 
     async getAll(queryParams: PagingDto, req: any) {
@@ -87,7 +88,7 @@ export class CategoriesService {
             if (!hasStatus) {
                 filterQuery.push({ key: 'status', operator: OPERATOR.EQ, value: STATUS.ACTIVED });
             }
-            qb = applyConditionOptions(qb, filterQuery, 'category');
+            qb = applyConditionOptions(qb, { and: filterQuery, or: [] }, 'category');
         } else {
             qb = qb.andWhere('category.status = :status', { status: STATUS.ACTIVED });
         }
@@ -191,4 +192,5 @@ export class CategoriesService {
 
         return await this.categoryRepository.remove(categoryEntity);
     }
+
 }

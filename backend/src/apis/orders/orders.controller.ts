@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Req, UseInterceptors } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { Authorize } from 'src/cores/decorators/auth/authorization.decorator';
+import { Authorize, AuthorizeGuest } from 'src/cores/decorators/auth/authorization.decorator';
 import { CreateOrderDto } from './entities/dto/create-order.dto';
 import { CacheManagerService } from 'src/cores/cache-manager/cache-manager.service';
 import { ENTITY_NAME } from 'src/common/constants/enum';
@@ -15,14 +15,18 @@ export class OrdersController {
     ) { }
 
     @Post()
-    @Authorize()
+    @AuthorizeGuest()
     @FindNearestStoreDecorator()
     async createOrder(
-        @Body() data: CreateOrderDto,
+        @Body() data: any,
         @Req() req: any
     ) {
         const { user } = req
-        return await this.ordersService.createOrder(data, user);
+        if (user) {
+            return await this.ordersService.createOrder(data, user);
+
+        }
+        return await this.ordersService.createOrderForGuest(data);
     }
 
     @Get(':id')

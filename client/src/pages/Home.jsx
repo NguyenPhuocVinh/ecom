@@ -31,12 +31,13 @@ function Home() {
         <div className="overflow-hidden">
             {" "}
             {/* Ngăn chặn thanh trượt ngang */}
-            <div className="min-h-screen flex flex-col">
+            <div className="flex flex-col">
                 {/* Hero Section */}
                 <section
-                    className="flex-1 flex items-center justify-center text-center bg-cover bg-center bg-no-repeat px-6 relative max-w-full"
+                    className="relative w-full h-[calc(100vh-112px)] flex items-center justify-center text-center bg-cover bg-no-repeat px-6 mt-[76px] -z-10"
                     style={{
                         backgroundImage: "url('/images/hero-section.webp')",
+                        backgroundPosition: "center top 30%",
                     }}
                 >
                     {/* Gradient Overlay */}
@@ -53,7 +54,7 @@ function Home() {
                         <a
                             href="/products"
                             className="mt-6 inline-block bg-white text-black px-6 py-3 rounded-full text-lg 
-                            hover:bg-gray-300 transition-all duration-300 shadow-md hover:shadow-lg"
+                hover:bg-gray-300 transition-all duration-300 shadow-md hover:shadow-lg"
                         >
                             Shop Now
                         </a>
@@ -71,17 +72,19 @@ function Home() {
                     navigation
                     className="max-w-full h-[500px] md:h-[650px] lg:h-[750px] shadow-lg"
                 >
-                    {["slider1.webp", "slider2.webp", "slider3.webp"].map(
-                        (img, index) => (
-                            <SwiperSlide key={index}>
-                                <img
-                                    src={`/images/${img}`}
-                                    alt={`Slide ${index + 1}`}
-                                    className="w-full h-full object-cover transition duration-500 hover:scale-105"
-                                />
-                            </SwiperSlide>
-                        )
-                    )}
+                    {[
+                        "https://res.cloudinary.com/ds3gsxqhm/image/upload/v1741066437/ecom/c8t9j8zordcqrhyvianc.webp",
+                        "https://res.cloudinary.com/ds3gsxqhm/image/upload/v1741066437/ecom/c8t9j8zordcqrhyvianc.webp",
+                        "https://res.cloudinary.com/ds3gsxqhm/image/upload/v1741066437/ecom/c8t9j8zordcqrhyvianc.webp",
+                    ].map((img, index) => (
+                        <SwiperSlide key={index}>
+                            <img
+                                src={`${img}`}
+                                alt={`Slide ${index + 1}`}
+                                className="w-full h-full object-cover transition duration-500 hover:scale-105"
+                            />
+                        </SwiperSlide>
+                    ))}
                 </Swiper>
             </section>
             {/* Featured Categories */}
@@ -113,50 +116,68 @@ function Home() {
                 </div>
             </section>
             {/* Best Sellers */}
-            <section className="container mx-auto max-w-screen-2xl px-6 py-12">
-                <h2 className="text-3xl font-bold text-center mb-8">
+            <section className="bg-gray-100 py-16 rounded-2xl shadow-lg">
+                <h2 className="text-4xl font-bold text-center mb-8 uppercase text-gray-800">
                     Best Sellers
                 </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 px-6">
                     {products.map((product, index) => (
                         <div
                             key={index}
-                            className="border rounded-2xl overflow-hidden shadow-lg group transition-all duration-300 hover:shadow-2xl relative flex flex-col justify-between"
+                            className="bg-white rounded-2xl overflow-hidden shadow-lg group transition-all duration-300 hover:shadow-2xl"
                         >
-                            <div className="relative w-full h-64 overflow-hidden">
+                            {/* Hình ảnh sản phẩm - Đã chỉnh về kích thước đồng nhất */}
+                            <div className="relative w-full h-56 flex items-center justify-center bg-gray-200">
                                 <img
                                     src={
                                         product.featuredImages[0]?.url ||
                                         "/images/placeholder.webp"
                                     }
                                     alt={product.name}
-                                    className="w-full h-full object-cover transform transition-all duration-500 group-hover:scale-110"
+                                    className="h-48 object-contain transition-transform duration-500 group-hover:scale-105"
                                 />
-                                <button className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:bg-red-500 hover:text-white transition-all">
+                                <button className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md hover:bg-gray-800 hover:text-white transition-all">
                                     <Heart className="w-5 h-5" />
                                 </button>
                             </div>
-                            <div className="p-5 text-center bg-white flex flex-col gap-3">
-                                <h3 className="text-lg font-semibold text-gray-900 group-hover:text-black transition-all">
-                                    {product.name}
-                                </h3>
-                                <p className="text-red-500 font-bold text-lg">
-                                    {new Intl.NumberFormat("vi-VN", {
-                                        style: "currency",
-                                        currency: "VND",
-                                    }).format(
-                                        product.attributes[0]?.variants[0]
-                                            ?.price?.rootPrice || 0
-                                    )}
-                                </p>
-                                <div className="flex justify-center">
-                                    <button className="w-14 h-14 flex items-center justify-center border border-gray-300 rounded-full hover:border-black transition-all">
-                                        <ShoppingCart className="w-6 h-6 text-gray-600 hover:text-black transition-all" />
-                                    </button>
+
+                            {/* Thông tin sản phẩm */}
+                            <div className="p-5 text-center bg-white flex flex-col justify-between h-[220px]">
+                                {/* Tiêu đề & Giá */}
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-black transition-all line-clamp-2 min-h-[55px]">
+                                        {product.name}
+                                    </h3>
+                                    <p className="text-red-500 font-bold text-lg min-h-[30px]">
+                                        {new Intl.NumberFormat("vi-VN", {
+                                            style: "currency",
+                                            currency: "VND",
+                                        }).format(
+                                            product.attributes[0]?.variants[0]
+                                                ?.price?.rootPrice || 0
+                                        )}
+                                    </p>
                                 </div>
+
+                                {/* Nút thêm vào giỏ hàng */}
+                                <button className="w-full bg-black text-white font-semibold py-2 rounded-full transition-all hover:bg-gray-800">
+                                    <ShoppingCart className="inline-block w-5 h-5 mr-2" />
+                                    Thêm vào giỏ hàng
+                                </button>
                             </div>
                         </div>
                     ))}
+                </div>
+
+                {/* Nút Xem Thêm */}
+                <div className="text-center mt-8">
+                    <a
+                        href="/products"
+                        className="bg-black text-white px-6 py-3 rounded-full text-lg font-semibold 
+            hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg"
+                    >
+                        Xem Thêm
+                    </a>
                 </div>
             </section>
         </div>

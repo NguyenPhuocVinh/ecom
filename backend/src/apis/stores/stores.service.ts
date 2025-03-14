@@ -115,7 +115,7 @@ export class StoresService {
             if (!hasStatus) {
                 filterQuery.push({ key: 'status', operator: OPERATOR.EQ, value: PRODUCT_STATUS.ACTIVED });
             }
-            qb = applyConditionOptions(qb, filterQuery, 'product');
+            qb = applyConditionOptions(qb, { and: filterQuery, or: [] }, 'product');
         } else {
             qb = qb.andWhere('product.status = :status', { status: PRODUCT_STATUS.ACTIVED });
         }
@@ -201,7 +201,7 @@ export class StoresService {
         let qb = this.storeRepository.createQueryBuilder('store');
         if (filterQuery && Array.isArray(filterQuery)) {
             qb.where('store.status = :status', { status: STATUS.ACTIVED });
-            qb = applyConditionOptions(qb, filterQuery, 'store');
+            qb = applyConditionOptions(qb, { and: filterQuery, or: [] }, 'store');
         } else {
             qb.where('store.status = :status', { status: STATUS.ACTIVED });
         }
