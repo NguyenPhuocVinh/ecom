@@ -1,14 +1,16 @@
 import slugify from "slugify";
 import { InventoryEntity } from "src/apis/inventories/entities/inventory.entity";
-import { ProductEntity } from "src/apis/products/entities/product.entity";
+import { ProductEntity } from "src/apis/products/entities/product-spu.entity";
 import { ENTITY_NAME, ROLE_STORE, STORE_STATUS } from "src/common/constants/enum";
-import { BaseEntity } from "src/cores/entities/base.entity";
+import { RootEntity } from "src/cores/entities/base.entity";
 import { BeforeInsert, Column, Entity, Index, JoinColumn, ManyToMany, ManyToOne, OneToMany, OneToOne, Point } from "typeorm";
 import { StoreManagerEntity } from "./store-manager.entity";
 import { DiscountEntity } from "src/apis/discounts/entities/discounts.entity";
+import { StoreInventoryEntity } from "./store-inventory.entity";
+import { CartEntity } from "src/apis/carts/entities/cart.entity";
 
 @Entity({ name: ENTITY_NAME.STORE })
-export class StoreEntity extends BaseEntity {
+export class StoreEntity extends RootEntity {
     @Column()
     name: string;
 
@@ -57,8 +59,8 @@ export class StoreEntity extends BaseEntity {
     @OneToMany(() => StoreManagerEntity, (storeManager) => storeManager.store, { cascade: true, onDelete: "CASCADE" })
     users: StoreManagerEntity[];
 
-    @OneToMany(() => InventoryEntity, (inventory) => inventory.store, { cascade: true, onDelete: "CASCADE" })
-    inventories: InventoryEntity[];
+    @OneToMany(() => StoreInventoryEntity, (inventory) => inventory.store)
+    inventories: StoreInventoryEntity[];
 
     @OneToMany(() => DiscountEntity, (discount) => discount.store, { cascade: true, onDelete: "CASCADE" })
     @JoinColumn()

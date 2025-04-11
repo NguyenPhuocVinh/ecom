@@ -8,7 +8,7 @@ import slugify from 'slugify';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { typeormTransactionHandler } from 'src/common/function-helper/transaction';
 import { StoreManagerEntity } from './entities/store-manager.entity';
-import { ProductEntity } from '../products/entities/product.entity';
+import { ProductEntity } from '../products/entities/product-spu.entity';
 import { PagingDto } from 'src/common/dto/page-result.dto';
 import { OPERATOR, PRODUCT_STATUS, STATUS } from 'src/common/constants/enum';
 import { applyConditionOptions } from 'src/common/function-helper/search';

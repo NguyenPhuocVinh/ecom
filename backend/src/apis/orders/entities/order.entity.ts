@@ -1,12 +1,12 @@
 import { ENTITY_NAME, ORDER_STATUS } from "src/common/constants/enum";
-import { BaseEntity } from "src/cores/entities/base.entity";
+import { RootEntity } from "src/cores/entities/base.entity";
 import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { OrderItemEntity } from "./order-item.entity";
 import { UserEntity } from "src/apis/users/entities/users.entity";
 import { PaymentEntity } from "src/apis/checkout/entities/payment.entity";
 
 @Entity({ name: ENTITY_NAME.ORDER })
-export class OrderEntity extends BaseEntity {
+export class OrderEntity extends RootEntity {
     @OneToMany(() => OrderItemEntity, item => item.order)
     items: OrderItemEntity[];
 

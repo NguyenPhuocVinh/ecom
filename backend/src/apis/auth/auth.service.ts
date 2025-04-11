@@ -10,7 +10,7 @@ import * as moment from 'moment-timezone';
 import { generateOtp } from 'src/common/function-helper/generate-otp';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EVENT_EMITTER } from 'src/common/constants/event-emitter.enum';
-import { MailerService } from '../mailer/mailer.service';
+// import { MailerService } from '../mailer/mailer.service';
 import { MailsService } from '../mails/mails.service';
 
 
@@ -75,7 +75,7 @@ export class AuthService {
             secret: jwt.secret,
             expiresIn: jwt.resetPasswordExpiresIn,
         });
-        await this.mailsService.sendEmailResetPassword(email, resetPasswordToken);
+        // await this.mailsService.sendEmailResetPassword(email, resetPasswordToken);
         return true;
     }
 

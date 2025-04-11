@@ -174,7 +174,7 @@ export class CategoriesService {
             shortDescription,
             cover: fileEntity,
             parent,
-            status,
+            // status,
             slug,
             updatedBy,
         });

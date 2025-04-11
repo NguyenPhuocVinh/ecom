@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post, Query, Req, UseInterceptors } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { Authorize, AuthorizeGuest } from 'src/cores/decorators/auth/authorization.decorator';
 import { CreateOrderDto } from './entities/dto/create-order.dto';
@@ -29,6 +29,13 @@ export class OrdersController {
         return await this.ordersService.createOrderForGuest(data);
     }
 
+    @Get('/success')
+    async handleSuccess(
+        @Query('session_id') sessionId: string
+    ) {
+        return await this.ordersService.handleSuccess(sessionId);
+    }
+
     @Get(':id')
     async getOrderDetail(
         @Param('id') id: string
@@ -44,4 +51,6 @@ export class OrdersController {
         await this.cacheManagerService.setCache(cacheKey, result);
         return result;
     }
+
+
 }

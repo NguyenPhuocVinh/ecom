@@ -2,10 +2,11 @@
 import * as _ from 'lodash';
 import slugify from 'slugify';
 import { FileEntity } from 'src/apis/medias/entities/media.entity';
-import { ProductEntity } from 'src/apis/products/entities/product.entity';
+import { SpuEntity } from 'src/apis/products/entities-v2/spu.entity';
+import { ProductEntity } from 'src/apis/products/entities/product-spu.entity';
 import { UserEntity } from 'src/apis/users/entities/users.entity';
 import { ENTITY_NAME, STATUS } from 'src/common/constants/enum';
-import { BaseEntity } from 'src/cores/entities/base.entity';
+import { RootEntity } from 'src/cores/entities/base.entity';
 import {
     BeforeInsert,
     BeforeUpdate,
@@ -17,7 +18,7 @@ import {
 } from 'typeorm';
 
 @Entity({ name: ENTITY_NAME.CATEGORY })
-export class CategoryEntity extends BaseEntity {
+export class CategoryEntity extends RootEntity {
     @Column()
     name: string;
 
@@ -29,9 +30,6 @@ export class CategoryEntity extends BaseEntity {
 
     @Column({ nullable: true })
     slug: string;
-
-    @OneToMany(() => ProductEntity, (product) => product.category)
-    products: ProductEntity[];
 
     @ManyToOne(() => FileEntity, { nullable: true })
     @JoinColumn()
@@ -45,14 +43,8 @@ export class CategoryEntity extends BaseEntity {
     @OneToMany(() => CategoryEntity, (category) => category.parent)
     children: CategoryEntity[];
 
-    @ManyToOne(() => UserEntity, (user) => user.categories)
-    createdBy: UserEntity;
-
-    @ManyToOne(() => UserEntity, (user) => user.categories)
-    updatedBy: UserEntity;
-
-    @Column({ default: STATUS.ACTIVED })
-    status: string;
+    @OneToMany(() => SpuEntity, (spu) => spu.category)
+    spus: SpuEntity[];
 
     @BeforeInsert()
     async beforeInsert() {

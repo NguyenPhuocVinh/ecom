@@ -1,12 +1,12 @@
 import { ENTITY_NAME } from "src/common/constants/enum";
-import { BaseEntity } from "src/cores/entities/base.entity";
+import { RootEntity } from "src/cores/entities/base.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
-import { ProductEntity } from "./product.entity";
+import { ProductEntity } from "./product-spu.entity";
 import { FileEntity } from "src/apis/medias/entities/media.entity";
 import { VariantEntity } from "./variant.entity";
 
 @Entity({ name: ENTITY_NAME.ATTRIBUTE })
-export class AttributeEntity extends BaseEntity {
+export class AttributeEntity extends RootEntity {
     @ManyToOne(() => ProductEntity, product => product.attributes, { onDelete: "CASCADE" })
     product: ProductEntity;
 

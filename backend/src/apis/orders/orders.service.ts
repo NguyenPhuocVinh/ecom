@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from './entities/order.entity';
 import { DataSource, Not, Repository } from 'typeorm';
@@ -8,7 +8,7 @@ import { CartItemEntity } from '../carts/entities/cart-item.entity';
 import { InventoryEntity } from '../inventories/entities/inventory.entity';
 import { CreateOrderDto } from './entities/dto/create-order.dto';
 import { typeormTransactionHandler } from 'src/common/function-helper/transaction';
-import { ProductEntity } from '../products/entities/product.entity';
+import { ProductEntity } from '../products/entities/product-spu.entity';
 import { PaymentEntity } from '../checkout/entities/payment.entity';
 import { ORDER_STATUS, PAYMENT_METHOD, PAYMENT_STATUS } from 'src/common/constants/enum';
 import Stripe from 'stripe';
@@ -350,8 +350,6 @@ export class OrdersService {
 
 
     private async paymentStripe(order: any) {
-        console.log("🚀 ~ OrdersService ~ paymentStripe ~ order:", order)
-
         // Tạo Checkout Session
         const session = await this.stripeClient.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -372,7 +370,7 @@ export class OrdersService {
                 },
             ],
             mode: 'payment',
-            success_url: 'http://localhost:5001/success?session_id={CHECKOUT_SESSION_ID}',
+            success_url: 'http://localhost:5001/api/v1/orders/success?session_id={CHECKOUT_SESSION_ID}',
             cancel_url: 'http://localhost:5001/cancel',
             metadata: { order_id: order.id },
         });
@@ -386,14 +384,16 @@ export class OrdersService {
         });
 
         if (!payment) {
-            await this.paymentRepository.insert({
-                order,
+            const newPay = await this.paymentRepository.insert({
+                order: { id: order.id },
                 method: PAYMENT_METHOD.STRIPE,
                 transactionId: session.id,
                 status: PAYMENT_STATUS.PENDING,
                 amount: order.totalAmount,
                 paymentInformation: JSON.stringify(session),
             });
+            console.log("🚀 ~ OrdersService ~ paymentStripe ~ newPay:", newPay)
+
         } else {
             await this.paymentRepository.update(payment.id, {
                 transactionId: session.id,
@@ -404,6 +404,22 @@ export class OrdersService {
         }
 
         return { url: session.url };
+    }
+
+    async handleSuccess(sessionId: string) {
+        const session = await this.stripeClient.checkout.sessions.retrieve(sessionId)
+        if (!session || session.payment_status !== 'paid') {
+            throw new NotFoundException('Payment not found or not completed');
+        }
+        const orderId = session.metadata.order_id;
+        const payment = await this.paymentRepository.findOne({
+            where: { order: { id: orderId } },
+        })
+        console.log("🚀 ~ OrdersService ~ handleSuccess ~ payment:", payment)
+
+
+
+        return { message: 'Payment completed' };
     }
 
     async getOrderDetail(orderId: string) {

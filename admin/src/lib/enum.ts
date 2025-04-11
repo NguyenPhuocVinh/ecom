@@ -87,3 +87,11 @@ export interface CreateProductDto {
     stores: string[];
     attributes: AttributeDto[];
 }
+
+
+export enum STATUS {
+    ACTIVE = 'active',
+    INACTIVE = 'inactive',
+    DELETED = 'deleted',
+    PENDING = 'pending',
+}

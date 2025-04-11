@@ -5,7 +5,7 @@ import { DataSource, EntityManager, Repository } from 'typeorm';
 import { CartItemEntity } from './entities/cart-item.entity';
 import { typeormTransactionHandler } from 'src/common/function-helper/transaction';
 import { AddProductToCartDto } from './entities/dto/add-product.entity';
-import { ProductEntity } from '../products/entities/product.entity';
+import { ProductEntity } from '../products/entities/product-spu.entity';
 import { InventoryEntity } from '../inventories/entities/inventory.entity';
 import { UpdateCartItemDto } from './entities/dto/update-cartItem.dto';
 import { VariantEntity } from '../products/entities/variant.entity';

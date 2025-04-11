@@ -5,8 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { StoreEntity } from './entities/store.entity';
 import { InventoryEntity } from '../inventories/entities/inventory.entity';
 import { StoreManagerEntity } from './entities/store-manager.entity';
-import { ProductEntity } from '../products/entities/product.entity';
+import { ProductEntity } from '../products/entities/product-spu.entity';
 import { DiscountEntity } from '../discounts/entities/discounts.entity';
+import { StoreInventoryEntity } from './entities/store-inventory.entity';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { DiscountEntity } from '../discounts/entities/discounts.entity';
       InventoryEntity,
       StoreManagerEntity,
       ProductEntity,
-      DiscountEntity
+      DiscountEntity,
+      StoreInventoryEntity
     ])
   ],
   controllers: [StoresController],

@@ -1,11 +1,12 @@
 import { ENTITY_NAME } from "src/common/constants/enum";
-import { BaseEntity } from "src/cores/entities/base.entity";
+import { RootEntity } from "src/cores/entities/base.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { CartEntity } from "./cart.entity";
-import { ProductEntity } from "src/apis/products/entities/product.entity";
+import { ProductEntity } from "src/apis/products/entities/product-spu.entity";
+import { SkuEntity } from "src/apis/products/entities-v2/sku.entity";
 
 @Entity({ name: ENTITY_NAME.CART_ITEM })
-export class CartItemEntity extends BaseEntity {
+export class CartItemEntity extends RootEntity {
     @ManyToOne(() => CartEntity, cart => cart.items, { onDelete: "CASCADE" })
     cart: CartEntity;
 
@@ -24,4 +25,8 @@ export class CartItemEntity extends BaseEntity {
 
     @Column()
     variant: string;
+
+
+    @ManyToOne(() => SkuEntity, (sku) => sku.cartItems)
+    sku: SkuEntity;
 }

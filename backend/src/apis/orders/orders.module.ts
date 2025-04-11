@@ -7,7 +7,7 @@ import { OrderItemEntity } from './entities/order-item.entity';
 import { CartEntity } from '../carts/entities/cart.entity';
 import { CartItemEntity } from '../carts/entities/cart-item.entity';
 import { InventoryEntity } from '../inventories/entities/inventory.entity';
-import { ProductEntity } from '../products/entities/product.entity';
+import { ProductEntity } from '../products/entities/product-spu.entity';
 import { UserEntity } from '../users/entities/users.entity';
 import { PaymentEntity } from '../checkout/entities/payment.entity';
 

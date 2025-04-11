@@ -1,10 +1,10 @@
 import { UserEntity } from 'src/apis/users/entities/users.entity';
 import { ENTITY_NAME } from 'src/common/constants/enum';
-import { BaseEntity } from 'src/cores/entities/base.entity';
+import { RootEntity } from 'src/cores/entities/base.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity({ name: ENTITY_NAME.TEMPLATE_MAIL })
-export class TemplateMailEntity extends BaseEntity {
+export class TemplateMailEntity extends RootEntity {
     @Column()
     name: string;
 
@@ -31,7 +31,4 @@ export class TemplateMailEntity extends BaseEntity {
 
     @Column({ nullable: true })
     tags: string;
-
-    @ManyToOne(() => UserEntity, (user) => user.mails, { nullable: true })
-    createdBy: UserEntity;
 }

@@ -1,6 +1,7 @@
+import { STATUS } from "src/common/constants/enum";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-export class BaseEntity {
+export class RootEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -10,4 +11,9 @@ export class BaseEntity {
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
+    @Column({ nullable: true })
+    createdBy: string | null;
+
+    @Column({ nullable: true })
+    updatedBy: string | null;
 }

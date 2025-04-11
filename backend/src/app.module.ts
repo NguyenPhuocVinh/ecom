@@ -25,6 +25,7 @@ import { useContainer } from 'class-validator';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { FindNearestStoreInterceptor } from './cores/interceptors/find-nearest-store.interceptor';
 import { GetLocationInterceptor } from './cores/interceptors/get-location.interceptor';
+import { CollectionsModule } from './collections/collections.module';
 
 
 const { db, redis } = appConfig;
@@ -75,6 +76,7 @@ const { db, redis } = appConfig;
     DiscountsModule,
     CheckoutModule,
     OrdersModule,
+    CollectionsModule,
   ],
   controllers: [AppController],
   providers: [
