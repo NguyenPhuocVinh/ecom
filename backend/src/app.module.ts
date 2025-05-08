@@ -25,7 +25,6 @@ import { useContainer } from 'class-validator';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { FindNearestStoreInterceptor } from './cores/interceptors/find-nearest-store.interceptor';
 import { GetLocationInterceptor } from './cores/interceptors/get-location.interceptor';
-import { CollectionsModule } from './collections/collections.module';
 
 
 const { db, redis } = appConfig;
@@ -36,16 +35,23 @@ const { db, redis } = appConfig;
       envFilePath: '.env',
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: () => ({
-        type: db.type,
-        host: db.host,
-        port: db.port,
-        username: db.username,
-        password: db.password,
-        database: db.database,
-        entities: db.entities,
-        synchronize: true,
-      })
+      useFactory: () => {
+
+        if (!db.database) {
+          throw new Error('Database name is not configured. Please check your .env file.');
+        }
+
+        return {
+          type: db.type,
+          host: db.host,
+          port: db.port,
+          username: db.username,
+          password: db.password,
+          database: db.database,
+          entities: db.entities,
+          synchronize: true,
+        };
+      }
     }),
     // BullModule.forRootAsync({
     //   useFactory: () => ({
@@ -76,7 +82,6 @@ const { db, redis } = appConfig;
     DiscountsModule,
     CheckoutModule,
     OrdersModule,
-    CollectionsModule,
   ],
   controllers: [AppController],
   providers: [

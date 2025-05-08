@@ -1,14 +1,13 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, BeforeInsert } from 'typeorm';
 import { SpuEntity } from './spu.entity';
-import { RootEntity } from 'src/cores/entities/base.entity';
 import { FileEntity } from 'src/apis/medias/entities/media.entity';
 import { StoreInventoryEntity } from 'src/apis/stores/entities/store-inventory.entity';
-import { CartEntity } from 'src/apis/carts/entities/cart.entity';
-import { CartItemEntity } from 'src/apis/carts/entities/cart-item.entity';
 import { SkuAttributeEntity } from './sku-attribute.entity';
+import { CreatedByRootEntity } from 'src/cores/entities/created-by-root.entity';
+import { CartItemEntity } from 'src/apis/carts/entitiesv2/cart-item.entity';
 
 @Entity('skus')
-export class SkuEntity extends RootEntity {
+export class SkuEntity extends CreatedByRootEntity {
 
     @ManyToOne(() => SpuEntity, (spu) => spu.skus)
     spu: SpuEntity;
@@ -29,5 +28,5 @@ export class SkuEntity extends RootEntity {
     inventories: StoreInventoryEntity[];
 
     @OneToMany(() => CartItemEntity, (cartItem) => cartItem.sku)
-    cartItems: CartItemEntity[];
+    cart_items: CartItemEntity[];
 }

@@ -2,18 +2,17 @@ import slugify from "slugify";
 import { CategoryEntity } from "src/apis/categories/entities/category.entity";
 import { FileEntity } from "src/apis/medias/entities/media.entity";
 import { ENTITY_NAME, PRODUCT_STATUS } from "src/common/constants/enum";
-import { RootEntity } from "src/cores/entities/base.entity";
+import { CreatedByRootEntity } from "src/cores/entities/created-by-root.entity";
 import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { PriceEntity } from "./price.entity";
 import { InventoryEntity } from "src/apis/inventories/entities/inventory.entity";
 import { StoreEntity } from "src/apis/stores/entities/store.entity";
 import { AttributeEntity } from "./atribute.entity";
 import { VariantEntity } from "./variant.entity";
-import { CartItemEntity } from "src/apis/carts/entities/cart-item.entity";
 import { OrderItemEntity } from "src/apis/orders/entities/order-item.entity";
 
 @Entity({ name: ENTITY_NAME.PRODUCT })
-export class ProductEntity extends RootEntity {
+export class ProductEntity extends CreatedByRootEntity {
     @Column()
     name: string;
 
@@ -36,9 +35,6 @@ export class ProductEntity extends RootEntity {
     @ManyToOne(() => StoreEntity, (store) => store.products)
     @JoinColumn()
     store: StoreEntity;
-
-    @OneToMany(() => CartItemEntity, (item) => item.product)
-    cartItem: CartItemEntity;
 
     @Column({ default: 0 })
     viewCount: number;

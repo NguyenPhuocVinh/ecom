@@ -18,7 +18,7 @@ export class CategoriesController {
     ) { }
 
     @Post()
-    // @Authorize()
+    @Authorize()
     @ApiBearerAuth()
     @ApiBody({ type: CreateCategoryDto })
     async create(

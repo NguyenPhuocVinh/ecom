@@ -1,10 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Attribute } from './attribute.entity';
 import { SkuAttributeEntity } from './sku-attribute.entity';
-import { RootEntity } from 'src/cores/entities/base.entity';
+import { CreatedByRootEntity } from 'src/cores/entities/created-by-root.entity';
 
 @Entity('attribute_value')
-export class AttributeValueEntity extends RootEntity {
+export class AttributeValueEntity extends CreatedByRootEntity {
 
     @ManyToOne(() => Attribute, (attribute) => attribute.values)
     attribute: Attribute;
@@ -13,6 +13,6 @@ export class AttributeValueEntity extends RootEntity {
     value: string;
 
     @OneToMany(() => SkuAttributeEntity, (skuAttribute) => skuAttribute.attribute_value)
-    skuAttributes: SkuAttributeEntity[];
+    sku_attributes: SkuAttributeEntity[];
 
 }

@@ -3,8 +3,6 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from './entities/order.entity';
 import { DataSource, Not, Repository } from 'typeorm';
 import { OrderItemEntity } from './entities/order-item.entity';
-import { CartEntity } from '../carts/entities/cart.entity';
-import { CartItemEntity } from '../carts/entities/cart-item.entity';
 import { InventoryEntity } from '../inventories/entities/inventory.entity';
 import { CreateOrderDto } from './entities/dto/create-order.dto';
 import { typeormTransactionHandler } from 'src/common/function-helper/transaction';
@@ -13,6 +11,8 @@ import { PaymentEntity } from '../checkout/entities/payment.entity';
 import { ORDER_STATUS, PAYMENT_METHOD, PAYMENT_STATUS } from 'src/common/constants/enum';
 import Stripe from 'stripe';
 import { appConfig } from 'src/configs/app.config';
+import { CartItemEntity } from '../carts/entitiesv2/cart-item.entity';
+import { CartEntity } from '../carts/entitiesv2/cart.entity';
 
 const { stripe } = appConfig;
 
@@ -90,120 +90,120 @@ export class OrdersService {
         const totalQuantity = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
 
         let order;
-        await typeormTransactionHandler(
-            async (manager) => {
-                order = manager.create(OrderEntity, {
-                    user: user ? { id: user.id } : null,
-                    userInfo: {
-                        firstName,
-                        lastName,
-                        fullName: `${lastName} ${firstName}`,
-                        shippingAddress,
-                        phone,
-                    },
-                    totalAmount,
-                    totalQuantity,
-                    status: ORDER_STATUS.PENDING,
-                });
-                await manager.save(order);
+        // await typeormTransactionHandler(
+        //     async (manager) => {
+        //         order = manager.create(OrderEntity, {
+        //             user: user ? { id: user.id } : null,
+        //             userInfo: {
+        //                 firstName,
+        //                 lastName,
+        //                 fullName: `${lastName} ${firstName}`,
+        //                 shippingAddress,
+        //                 phone,
+        //             },
+        //             totalAmount,
+        //             totalQuantity,
+        //             status: ORDER_STATUS.PENDING,
+        //         });
+        //         await manager.save(order);
 
-                const orderItems = selectedItems.map(cartItem => {
-                    const product = cartItem.product;
-                    if (!product) return null;
+        //         const orderItems = selectedItems.map(cartItem => {
+        //             const product = cartItem.product;
+        //             if (!product) return null;
 
-                    const attribute = product.attributes.find(attr => attr.code === cartItem.attribute);
-                    const variant = attribute?.variants.find(v => v.code === cartItem.variant);
+        //             const attribute = product.attributes.find(attr => attr.code === cartItem.attribute);
+        //             const variant = attribute?.variants.find(v => v.code === cartItem.variant);
 
-                    return manager.create(OrderItemEntity, {
-                        order,
-                        product,
-                        productOrder: {
-                            name: product.name,
-                            price: cartItem.price,
-                            quantity: cartItem.quantity,
-                            featuredImage: {
-                                title: variant?.featuredImages?.[0]?.title || null,
-                                secure_url: variant?.featuredImages?.[0]?.url || null,
-                                alt: variant?.featuredImages?.[0]?.alt || null,
-                                url: variant?.featuredImages?.[0]?.url || null,
-                            },
-                            longDescription: product.longDescription,
-                            shortDescription: product.shortDescription,
-                            attribute: attribute ? {
-                                key: attribute.key,
-                                value: attribute.value,
-                                variant: variant ? {
-                                    key: variant.key,
-                                    value: variant.value
-                                } : null
-                            } : null
-                        }
-                    });
-                }).filter(item => item !== null);
+        //             return manager.create(OrderItemEntity, {
+        //                 order,
+        //                 product,
+        //                 productOrder: {
+        //                     name: product.name,
+        //                     price: cartItem.price,
+        //                     quantity: cartItem.quantity,
+        //                     featuredImage: {
+        //                         title: variant?.featuredImages?.[0]?.title || null,
+        //                         secure_url: variant?.featuredImages?.[0]?.url || null,
+        //                         alt: variant?.featuredImages?.[0]?.alt || null,
+        //                         url: variant?.featuredImages?.[0]?.url || null,
+        //                     },
+        //                     longDescription: product.longDescription,
+        //                     shortDescription: product.shortDescription,
+        //                     attribute: attribute ? {
+        //                         key: attribute.key,
+        //                         value: attribute.value,
+        //                         variant: variant ? {
+        //                             key: variant.key,
+        //                             value: variant.value
+        //                         } : null
+        //                     } : null
+        //                 }
+        //             });
+        //         }).filter(item => item !== null);
 
-                await manager.save(orderItems);
+        //         await manager.save(orderItems);
 
-                await Promise.all([
-                    ...selectedItems.map(async (cartItem) => {
-                        const product = cartItem.product;
-                        if (!product) return;
+        //         await Promise.all([
+        //             ...selectedItems.map(async (cartItem) => {
+        //                 const product = cartItem.product;
+        //                 if (!product) return;
 
-                        const updatedInventory = await manager.createQueryBuilder(InventoryEntity, 'inventory')
-                            .select('inventory.id, inventory.quantity')
-                            .leftJoin('inventory.variant', 'variant')
-                            .leftJoin('variant.attribute', 'attribute')
-                            .leftJoin('attribute.product', 'product')
-                            .leftJoin('inventory.store', 'store')
-                            .where('product.id = :productId', { productId: product.id })
-                            .andWhere('attribute.code = :attribute', { attribute: cartItem.attribute })
-                            .andWhere('variant.code = :variant', { variant: cartItem.variant })
-                            .andWhere('store.id = :storeId', { storeId })
-                            .getRawOne();
+        //                 const updatedInventory = await manager.createQueryBuilder(InventoryEntity, 'inventory')
+        //                     .select('inventory.id, inventory.quantity')
+        //                     .leftJoin('inventory.variant', 'variant')
+        //                     .leftJoin('variant.attribute', 'attribute')
+        //                     .leftJoin('attribute.product', 'product')
+        //                     .leftJoin('inventory.store', 'store')
+        //                     .where('product.id = :productId', { productId: product.id })
+        //                     .andWhere('attribute.code = :attribute', { attribute: cartItem.attribute })
+        //                     .andWhere('variant.code = :variant', { variant: cartItem.variant })
+        //                     .andWhere('store.id = :storeId', { storeId })
+        //                     .getRawOne();
 
-                        if (!updatedInventory || updatedInventory.quantity < cartItem.quantity) {
-                            throw new BadRequestException('INSUFFICIENT_STOCK');
-                        }
+        //                 if (!updatedInventory || updatedInventory.quantity < cartItem.quantity) {
+        //                     throw new BadRequestException('INSUFFICIENT_STOCK');
+        //                 }
 
-                        await manager.update(
-                            InventoryEntity,
-                            updatedInventory.id,
-                            {
-                                quantity: updatedInventory.quantity - cartItem.quantity,
-                            }
-                        );
-                    }),
+        //                 await manager.update(
+        //                     InventoryEntity,
+        //                     updatedInventory.id,
+        //                     {
+        //                         quantity: updatedInventory.quantity - cartItem.quantity,
+        //                     }
+        //                 );
+        //             }),
 
-                    manager.createQueryBuilder()
-                        .delete()
-                        .from(CartItemEntity)
-                        .where("id IN (:...ids)", { ids: items })
-                        .execute()
-                ]);
+        //             manager.createQueryBuilder()
+        //                 .delete()
+        //                 .from(CartItemEntity)
+        //                 .where("id IN (:...ids)", { ids: items })
+        //                 .execute()
+        //         ]);
 
-                const remainingCartItems = await manager.find(
-                    CartItemEntity,
-                    {
-                        where: {
-                            cart: { id: cart.id }
-                        }
-                    }
-                );
+        //         const remainingCartItems = await manager.find(
+        //             CartItemEntity,
+        //             {
+        //                 where: {
+        //                     cart: { id: cart.id }
+        //                 }
+        //             }
+        //         );
 
-                await manager.update(
-                    CartEntity,
-                    cart.id,
-                    {
-                        totalPrice: remainingCartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
-                        totalQuantity: remainingCartItems.reduce((sum, item) => sum + item.quantity, 0),
-                    }
-                );
-            },
-            (error) => {
-                this.logger.error(error);
-                throw new BadRequestException('CREATE_ORDER_FAILED');
-            },
-            this.dataSource,
-        );
+        //         await manager.update(
+        //             CartEntity,
+        //             cart.id,
+        //             {
+        //                 // totalPrice: remainingCartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        //                 // totalQuantity: remainingCartItems.reduce((sum, item) => sum + item.quantity, 0),
+        //             }
+        //         );
+        //     },
+        //     (error) => {
+        //         this.logger.error(error);
+        //         throw new BadRequestException('CREATE_ORDER_FAILED');
+        //     },
+        //     this.dataSource,
+        // );
 
         try {
 

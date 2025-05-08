@@ -1,10 +1,10 @@
 import { OrderEntity } from "src/apis/orders/entities/order.entity";
 import { ENTITY_NAME, PAYMENT_METHOD, PAYMENT_STATUS } from "src/common/constants/enum";
-import { RootEntity } from "src/cores/entities/base.entity";
+import { CreatedByRootEntity } from "src/cores/entities/created-by-root.entity";
 import { Column, Entity, OneToOne } from "typeorm";
 
 @Entity({ name: ENTITY_NAME.PAYMENT })
-export class PaymentEntity extends RootEntity {
+export class PaymentEntity extends CreatedByRootEntity {
     @OneToOne(() => OrderEntity, order => order.payment)
     order: OrderEntity;
 

@@ -1,11 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { AttributeValueEntity } from './attribute-value.entity';
-import { RootEntity } from 'src/cores/entities/base.entity';
+import { CreatedByRootEntity } from 'src/cores/entities/created-by-root.entity';
 import { SkuAttributeEntity } from './sku-attribute.entity';
 
 
 @Entity('attribute')
-export class Attribute extends RootEntity {
+export class Attribute extends CreatedByRootEntity {
     @Column({ type: 'varchar', length: 100, nullable: false })
     name: string;
 
@@ -13,6 +13,6 @@ export class Attribute extends RootEntity {
     values: AttributeValueEntity[];
 
     @OneToMany(() => SkuAttributeEntity, (skuAttribute) => skuAttribute.attribute)
-    skuAttributes: SkuAttributeEntity[];
+    sku_attributes: SkuAttributeEntity[];
 
 }

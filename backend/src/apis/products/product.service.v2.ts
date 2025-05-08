@@ -14,6 +14,9 @@ import { AttributeValueEntity } from './entities-v2/attribute-value.entity';
 import { StoreInventoryEntity } from '../stores/entities/store-inventory.entity';
 import { StoreEntity } from '../stores/entities/store.entity';
 import { Attribute } from './entities-v2/attribute.entity';
+import { CategoryEntity } from '../categories/entities/category.entity';
+import { CreateProductDto, CreateSkuAttributeDto, CreateSkuDto, InventoryDto, SkuAttributeDto } from './entities-v2/dto/product.dto';
+import { generateSkuCode } from '../../common/function-helper/generateSpuId';
 
 export class ProductServiceV2 {
     private readonly logger = new Logger(ProductServiceV2.name);
@@ -41,19 +44,31 @@ export class ProductServiceV2 {
         private readonly dataSource: DataSource,
     ) { }
 
-    async createProduct(dto: any): Promise<SpuEntity> {
+    async createProduct(dto: CreateProductDto): Promise<SpuEntity> {
         return typeormTransactionHandler<SpuEntity>(
             async (manager: EntityManager): Promise<SpuEntity> => {
+                const category = await manager.findOne(CategoryEntity, {
+                    where: { id: dto.category_id },
+                });
+                if (!category) throw new NotFoundException(`Category with ID ${dto.category_id} not found`);
                 const spu = manager.create(SpuEntity, {
                     name: dto.name,
                     description: dto.description,
-                    category: { id: dto.category_id },
-                    images: [],
+                    category,
                 });
                 await manager.save(spu);
 
                 if (dto.skus && dto.skus.length > 0) {
                     for (const skuDto of dto.skus) {
+                        let attributeValues = '';
+                        if (skuDto.attributes && skuDto.attributes.length > 0) {
+                            attributeValues = skuDto.attributes.map(attr => {
+                                return attr.attribute_value.toString().toUpperCase();
+                            }).join('-');
+                        }
+
+                        const skuCode = await generateSkuCode(spu.category.name, attributeValues);
+                        skuDto.sku_code = skuCode;
                         await this.createSku(manager, spu, skuDto);
                     }
                 }
@@ -83,7 +98,7 @@ export class ProductServiceV2 {
     private async createSku(
         manager: EntityManager,
         spu: SpuEntity,
-        dto: any,
+        dto: CreateSkuDto,
     ): Promise<SkuEntity> {
         if (dto.sku_code) {
             const existingSku = await manager.findOne(SkuEntity, {
@@ -98,8 +113,6 @@ export class ProductServiceV2 {
             spu,
             sku_code: dto.sku_code,
             price: dto.price,
-            weight: dto.weight,
-            dimensions: dto.dimensions,
             images: [],
         });
         const savedSku = await manager.save(sku);
@@ -121,7 +134,7 @@ export class ProductServiceV2 {
     private async createSkuAttribute(
         manager: EntityManager,
         sku: SkuEntity,
-        dto: any,
+        dto: CreateSkuAttributeDto,
     ): Promise<SkuAttributeEntity> {
         let attribute = dto.attribute_id
             ? await manager.findOne(Attribute, { where: { id: dto.attribute_id } })
@@ -145,9 +158,9 @@ export class ProductServiceV2 {
             })
             : undefined;
 
-        if (!attributeValue && dto.attribute_value_name) {
+        if (!attributeValue && dto.attribute_value) {
             attributeValue = manager.create(AttributeValueEntity, {
-                value: dto.attribute_value_name,
+                value: dto.attribute_value,
                 attribute: attribute,
             });
             await manager.save(attributeValue);
@@ -168,7 +181,7 @@ export class ProductServiceV2 {
     private async createStoreInventory(
         manager: EntityManager,
         sku: SkuEntity,
-        dto: any,
+        dto: InventoryDto,
     ): Promise<StoreInventoryEntity> {
         const store = await manager.findOne(StoreEntity, {
             where: { id: dto.store_id },
@@ -207,97 +220,6 @@ export class ProductServiceV2 {
         return product;
     }
 
-    async updateProduct(id: string, dto: any): Promise<SpuEntity> {
-        return typeormTransactionHandler<SpuEntity>(
-            async (manager: EntityManager): Promise<SpuEntity> => {
-                const product = await this.getProductById(id);
-                if (!product) {
-                    throw new NotFoundException(`Product with ID ${id} not found`);
-                }
-
-                // Update product properties
-                product.name = dto.name;
-                product.description = dto.description;
-                if (product.category) {
-                    product.category.id = dto.category_id;
-                }
-                await manager.save(product);
-
-                // Update SKUs and their attributes
-                if (dto.skus && dto.skus.length > 0) {
-                    for (const skuDto of dto.skus) {
-                        await this.updateSku(manager, product, skuDto);
-                    }
-                }
-
-                return product;
-            },
-            (error) => {
-                throw error;
-            },
-            this.dataSource,
-        ).then(async (spu) => {
-            return this.spuRepository.findOne({
-                where: { id: spu.id },
-                relations: [
-                    'category',
-                    'skus',
-                    'images',
-                    'skus.attributes',
-                    'skus.attributes.attribute',
-                    'skus.attributes.attribute_value',
-                    'skus.inventories',
-                ],
-            });
-        });
-    }
-
-    private async updateSku(
-        manager: EntityManager,
-        spu: SpuEntity,
-        dto: any,
-    ): Promise<SkuEntity> {
-        const sku = await manager.findOne(SkuEntity, {
-            where: { id: dto.id, spu },
-        });
-
-        if (!sku) {
-            throw new NotFoundException(`SKU with ID ${dto.id} not found`);
-        }
-
-        // Update SKU properties
-        sku.sku_code = dto.sku_code;
-        sku.price = dto.price;
-
-        await manager.save(sku);
-
-        // Update SKU attributes
-        if (dto.attributes && dto.attributes.length > 0) {
-            for (const attrDto of dto.attributes) {
-                await this.updateSkuAttribute(manager, sku, attrDto);
-            }
-        }
-
-        return sku;
-    }
-    private async updateSkuAttribute(
-        manager: EntityManager,
-        sku: SkuEntity,
-        dto: any,
-    ): Promise<SkuAttributeEntity> {
-        const skuAttribute = await manager.findOne(SkuAttributeEntity, {
-            where: { id: dto.id, sku },
-        });
-
-        if (!skuAttribute) {
-            throw new NotFoundException(`SKU Attribute with ID ${dto.id} not found`);
-        }
-
-        // Update SKU attribute properties
-        skuAttribute.attribute = { id: dto.attribute_id };
-        skuAttribute.attribute_value = { id: dto.attribute_value_id };
-        return manager.save(skuAttribute);
-    }
 
     async deleteProduct(id: string): Promise<void> {
         return typeormTransactionHandler<void>(
@@ -314,5 +236,149 @@ export class ProductServiceV2 {
             },
             this.dataSource,
         );
+    }
+
+    // async updateProduct(id: string, dto: any) {
+    //     return typeormTransactionHandler<SpuEntity>(
+    //         async (manager: EntityManager) => {
+    //             const product = await this.getProductById(id);
+    //             if (!product) {
+    //                 throw new NotFoundException(`Product with ID ${id} not found`);
+    //             }
+
+    //             // Cập nhật thông tin sản phẩm
+    //             product.name = dto.name;
+    //             product.description = dto.description;
+    //             product.category = { id: dto.category_id } as CategoryEntity;
+    //             await manager.save(product);
+
+    //             // Xử lý SKUs
+    //             const existingSkus = await manager.find(SkuEntity, {
+    //                 where: { spu: { id: product.id } },
+    //                 relations: ['attributes'],
+    //             });
+
+    //             const incomingSkuIds = dto.skus?.map((s: any) => s.id) || [];
+
+    //             // Xóa những SKU không còn trong DTO
+    //             for (const sku of existingSkus) {
+    //                 if (!incomingSkuIds.includes(sku.id)) {
+    //                     await manager.delete(SkuAttributeEntity, { sku: { id: sku.id } });
+    //                     await manager.delete(SkuEntity, { id: sku.id });
+    //                 }
+    //             }
+
+    //             // Cập nhật hoặc thêm mới các SKU còn lại
+    //             for (const skuDto of dto.skus || []) {
+    //                 await this.updateSku(manager, product, skuDto);
+    //             }
+
+    //             return product;
+    //         },
+    //         (error) => {
+    //             throw error;
+    //         },
+    //         this.dataSource,
+    //     ).then(async (spu) => {
+    //         return this.spuRepository.findOne({
+    //             where: { id: spu.id },
+    //             relations: [
+    //                 'category',
+    //                 'skus',
+    //                 'images',
+    //                 'skus.attributes',
+    //                 'skus.attributes.attribute',
+    //                 'skus.attributes.attribute_value',
+    //                 'skus.inventories',
+    //             ],
+    //         });
+    //     });
+    // }
+
+    // private async updateSku(
+    //     manager: EntityManager,
+    //     spu: SpuEntity,
+    //     dto: any,
+    // ): Promise<SkuEntity> {
+    //     let sku = await manager.findOne(SkuEntity, { where: { id: dto.id } });
+
+    //     if (!sku) {
+    //         sku = manager.create(SkuEntity, {
+    //             id: dto.id,
+    //             sku_code: dto.sku_code,
+    //             price: dto.price,
+    //             spu,
+    //         });
+    //     } else {
+    //         sku.sku_code = dto.sku_code;
+    //         sku.price = dto.price;
+    //     }
+
+    //     sku.spu = spu;
+    //     await manager.save(sku);
+
+    //     await manager.delete(SkuAttributeEntity, { sku: { id: sku.id } });
+
+    //     for (const attrDto of dto.attributes || []) {
+    //         await this.updateSkuAttribute(manager, sku, attrDto);
+    //     }
+
+    //     return sku;
+    // }
+
+    // private async updateSkuAttribute(
+    //     manager: EntityManager,
+    //     sku: SkuEntity,
+    //     dto: any,
+    // ): Promise<SkuAttributeEntity> {
+
+    //     let attribute: Attribute;
+    //     let attributeValue: AttributeValueEntity;
+
+    //     if (dto.attribute_id && dto.attribute_value_id) {
+    //         attribute = await manager.findOne(Attribute, { where: { id: dto.attribute_id } });
+    //         attributeValue = await manager.findOne(AttributeValueEntity, {
+    //             where: {
+    //                 id: dto.attribute_value_id,
+    //                 attribute: { id: dto.attribute_id },
+    //             },
+    //         });
+
+    //         // Cập nhật tên attribute nếu khác
+    //         if (attribute && dto.attribute_name && attribute.name !== dto.attribute_name) {
+    //             attribute.name = dto.attribute_name;
+    //             await manager.save(attribute);
+    //         }
+
+    //         // Cập nhật giá trị attribute nếu khác
+    //         if (attributeValue && dto.attribute_value && attributeValue.value !== dto.attribute_value) {
+    //             attributeValue.value = dto.attribute_value;
+    //             await manager.save(attributeValue);
+    //         }
+
+    //         if (!attribute || !attributeValue) {
+    //             throw new NotFoundException('Invalid attribute_id or attribute_value_id');
+    //         }
+    //     }
+    // }
+
+    async getProductBySkuId(skuId: string): Promise<SkuEntity> {
+        const sku = await this.skuRepository.findOne({
+            where: { id: skuId },
+            relations: [
+                'spu',
+                'spu.category',
+                'attributes',
+                'attributes.attribute',
+                'attributes.attribute_value',
+                'inventories',
+            ],
+        });
+
+        if (!sku) {
+            throw new NotFoundException(`SKU with ID ${skuId} not found`);
+        }
+
+        return sku;
     }
 }

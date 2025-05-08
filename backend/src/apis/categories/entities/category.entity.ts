@@ -6,7 +6,7 @@ import { SpuEntity } from 'src/apis/products/entities-v2/spu.entity';
 import { ProductEntity } from 'src/apis/products/entities/product-spu.entity';
 import { UserEntity } from 'src/apis/users/entities/users.entity';
 import { ENTITY_NAME, STATUS } from 'src/common/constants/enum';
-import { RootEntity } from 'src/cores/entities/base.entity';
+import { CreatedByRootEntity } from 'src/cores/entities/created-by-root.entity';
 import {
     BeforeInsert,
     BeforeUpdate,
@@ -18,7 +18,7 @@ import {
 } from 'typeorm';
 
 @Entity({ name: ENTITY_NAME.CATEGORY })
-export class CategoryEntity extends RootEntity {
+export class CategoryEntity extends CreatedByRootEntity {
     @Column()
     name: string;
 
@@ -30,6 +30,9 @@ export class CategoryEntity extends RootEntity {
 
     @Column({ nullable: true })
     slug: string;
+
+    @Column({ enum: STATUS, default: STATUS.ACTIVED })
+    status: STATUS;
 
     @ManyToOne(() => FileEntity, { nullable: true })
     @JoinColumn()
@@ -45,6 +48,7 @@ export class CategoryEntity extends RootEntity {
 
     @OneToMany(() => SpuEntity, (spu) => spu.category)
     spus: SpuEntity[];
+
 
     @BeforeInsert()
     async beforeInsert() {

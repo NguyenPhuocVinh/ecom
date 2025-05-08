@@ -44,6 +44,10 @@ import { Attribute } from './entities-v2/attribute.entity';
   providers: [
     // ProductsService,
     ProductServiceV2
+  ],
+  exports: [
+    ProductServiceV2,
   ]
+
 })
 export class ProductsModule { }

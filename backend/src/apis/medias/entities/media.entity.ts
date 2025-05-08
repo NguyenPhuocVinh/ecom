@@ -8,11 +8,11 @@ import { ProductEntity } from 'src/apis/products/entities/product-spu.entity';
 import { VariantEntity } from 'src/apis/products/entities/variant.entity';
 import { UserEntity } from 'src/apis/users/entities/users.entity';
 import { ENTITY_NAME } from 'src/common/constants/enum';
-import { RootEntity } from 'src/cores/entities/base.entity';
+import { CreatedByRootEntity } from 'src/cores/entities/created-by-root.entity';
 import { BeforeInsert, Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
 @Entity({ name: ENTITY_NAME.FILE })
-export class FileEntity extends RootEntity {
+export class FileEntity extends CreatedByRootEntity {
     @Column()
     title: string;
 

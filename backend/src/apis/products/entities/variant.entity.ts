@@ -1,14 +1,14 @@
 import { InventoryEntity } from "src/apis/inventories/entities/inventory.entity";
 import { FileEntity } from "src/apis/medias/entities/media.entity";
 import { ENTITY_NAME } from "src/common/constants/enum";
-import { RootEntity } from "src/cores/entities/base.entity";
+import { CreatedByRootEntity } from "src/cores/entities/created-by-root.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { ProductEntity } from "./product-spu.entity";
 import { PriceEntity } from "./price.entity";
 import { AttributeEntity } from "./atribute.entity";
 
 @Entity({ name: ENTITY_NAME.VARIANT })
-export class VariantEntity extends RootEntity {
+export class VariantEntity extends CreatedByRootEntity {
     @ManyToOne(() => AttributeEntity, attribute => attribute.variants, { onDelete: "CASCADE" })
     attribute: AttributeEntity;
 

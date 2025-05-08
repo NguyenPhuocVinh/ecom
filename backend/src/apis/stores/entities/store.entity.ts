@@ -2,15 +2,15 @@ import slugify from "slugify";
 import { InventoryEntity } from "src/apis/inventories/entities/inventory.entity";
 import { ProductEntity } from "src/apis/products/entities/product-spu.entity";
 import { ENTITY_NAME, ROLE_STORE, STORE_STATUS } from "src/common/constants/enum";
-import { RootEntity } from "src/cores/entities/base.entity";
+import { CreatedByRootEntity } from "src/cores/entities/created-by-root.entity";
 import { BeforeInsert, Column, Entity, Index, JoinColumn, ManyToMany, ManyToOne, OneToMany, OneToOne, Point } from "typeorm";
 import { StoreManagerEntity } from "./store-manager.entity";
 import { DiscountEntity } from "src/apis/discounts/entities/discounts.entity";
 import { StoreInventoryEntity } from "./store-inventory.entity";
-import { CartEntity } from "src/apis/carts/entities/cart.entity";
+// import { CartEntity } from "src/apis/carts/entities/cart.entity";
 
 @Entity({ name: ENTITY_NAME.STORE })
-export class StoreEntity extends RootEntity {
+export class StoreEntity extends CreatedByRootEntity {
     @Column()
     name: string;
 

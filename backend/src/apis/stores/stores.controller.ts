@@ -17,7 +17,7 @@ export class StoresController {
     ) { }
 
     @Post()
-    // @Authorize()
+    @Authorize()
     @GetLocationDecorator()
     async create(
         @Body() createStoreDto: CreateStoreDto,

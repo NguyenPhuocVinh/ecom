@@ -63,3 +63,8 @@ export const appConfig = {
 
 }
 
+// Add validation
+if (!appConfig.db.database) {
+    throw new Error('Database name is not configured. Please check your .env file.');
+}
+

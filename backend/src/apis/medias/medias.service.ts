@@ -14,7 +14,7 @@ export class MediasService {
     ) { }
 
     async uploadImage(title: string, file: Express.Multer.File, req: any) {
-        const createdBy = req.user;
+        const created_by = req.user;
         return new Promise((resolve, reject) => {
             cloudinary.uploader.upload(file.path,
                 {
@@ -31,7 +31,7 @@ export class MediasService {
                             const media = this.fileRepository.create({
                                 ...result,
                                 title,
-                                createdBy
+                                created_by
                             })
                             resolve(await this.fileRepository.save(media));
 
@@ -55,7 +55,7 @@ export class MediasService {
     }
 
     async uploadImages(title: string, files: Express.Multer.File[], req: any) {
-        const createdBy = req.user;
+        const created_by = req.user;
 
         const uploadPromises = files.map(file =>
             new Promise(async (resolve, reject) => {
@@ -72,7 +72,7 @@ export class MediasService {
                                 const media = this.fileRepository.create({
                                     ...result,
                                     title,  // Áp dụng chung một title
-                                    createdBy
+                                    created_by
                                 });
                                 resolve(await this.fileRepository.save(media));
 

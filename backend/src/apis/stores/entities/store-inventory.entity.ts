@@ -7,10 +7,10 @@ import {
 } from 'typeorm';
 import { StoreEntity } from './store.entity';
 import { SkuEntity } from 'src/apis/products/entities-v2/sku.entity';
-import { RootEntity } from 'src/cores/entities/base.entity';
+import { CreatedByRootEntity } from 'src/cores/entities/created-by-root.entity';
 
 @Entity('store_inventory')
-export class StoreInventoryEntity extends RootEntity {
+export class StoreInventoryEntity extends CreatedByRootEntity {
     @PrimaryColumn()
     store_id: string;
 

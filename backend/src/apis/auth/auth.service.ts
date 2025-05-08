@@ -12,6 +12,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EVENT_EMITTER } from 'src/common/constants/event-emitter.enum';
 // import { MailerService } from '../mailer/mailer.service';
 import { MailsService } from '../mails/mails.service';
+import { RolesService } from '../roles/roles.service';
 
 
 const { jwt } = appConfig;
@@ -24,11 +25,16 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private eventEmitter: EventEmitter2,
         private readonly mailsService: MailsService,
+        private readonly rolesService: RolesService,
     ) { }
     async register(createUserDto: CreateUserDto) {
-        const { password, email } = createUserDto;
+        const { password, email, role } = createUserDto;
         const isExistUser = await this.usersService.checkUserExist(email);
         const hashedPassword = await bcrypt.hash(password, 10);
+        if (!role) {
+            const roleUser = await this.rolesService.getRoleUser();
+            createUserDto.role = roleUser.id;
+        }
         return isExistUser ? Promise.reject(new BadRequestException('USER_EXISTED')) : this.usersService.createUser({ ...createUserDto, password: hashedPassword });
     }
 

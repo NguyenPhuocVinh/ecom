@@ -37,15 +37,15 @@ export class ProductsController {
         return await this.productsService.getProductById(id);
     }
 
-    @Put(':id')
-    @Authorize()
-    async updateQuantity(
-        @Req() req: any,
-        @Param('id') id: string,
-        @Body() data: any,
-    ) {
-        // return await this.productsService.updateQuantity(id, data, req);
-    }
+    // @Put(':id')
+    // // @Authorize()
+    // async updateProduct(
+    //     @Req() req: any,
+    //     @Param('id') id: string,
+    //     @Body() data: any,
+    // ) {
+    //     return await this.productsService.updateProduct(id, data);
+    // }
 
     @Delete(':id')
     @Authorize()
@@ -55,4 +55,5 @@ export class ProductsController {
     ) {
         // return await this.productsService.delete(id, req);
     }
+
 }

@@ -15,14 +15,14 @@ export class SkuAttributeEntity {
     attribute_value_id: string;
 
     @ManyToOne(() => SkuEntity, (sku) => sku.attributes, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'sku_id' }) // 👈 Map vào cột sku_id
+    @JoinColumn({ name: 'sku_id' })
     sku: SkuEntity;
 
-    @ManyToOne(() => Attribute, (attribute) => attribute.skuAttributes, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'attribute_id' }) // 👈 Map vào cột attribute_id
+    @ManyToOne(() => Attribute, (attribute) => attribute.sku_attributes, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'attribute_id' })
     attribute: Attribute;
 
-    @ManyToOne(() => AttributeValueEntity, (attributeValue) => attributeValue.skuAttributes, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'attribute_value_id' }) // 👈 Map vào cột attribute_value_id
+    @ManyToOne(() => AttributeValueEntity, (attributeValue) => attributeValue.sku_attributes, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'attribute_value_id' })
     attribute_value: AttributeValueEntity;
 }

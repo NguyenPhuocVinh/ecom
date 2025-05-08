@@ -1,10 +1,10 @@
 import { ENTITY_NAME } from "src/common/constants/enum";
-import { RootEntity } from "src/cores/entities/base.entity";
+import { CreatedByRootEntity } from "src/cores/entities/created-by-root.entity";
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, OneToOne } from "typeorm";
 import { UserEntity } from "./users.entity";
 
 @Entity({ name: ENTITY_NAME.OTP })
-export class OtpEntity extends RootEntity {
+export class OtpEntity extends CreatedByRootEntity {
     @Column()
     otp: string;
 

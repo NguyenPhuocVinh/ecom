@@ -17,8 +17,9 @@ export async function paginate<T>(
     }
 }> {
     qb.skip((currentPage - 1) * perPage).take(perPage);
-
+    console.log("🚀 ~ qb:", qb.getQueryAndParameters())
     const [data, total] = await qb.getManyAndCount();
+    console.log("🚀 ~ total:", total)
 
     const totalPages = Math.ceil(total / perPage);
     const from = total === 0 ? 0 : (currentPage - 1) * perPage + 1;

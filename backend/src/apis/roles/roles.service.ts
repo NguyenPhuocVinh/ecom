@@ -30,4 +30,8 @@ export class RolesService {
     async getRoleById(id: string) {
         return this.roleRepository.findOne({ where: { id }, relations: ['permissions'] });
     }
+
+    async getRoleUser() {
+        return this.roleRepository.findOne({ where: { isDefault: true } });
+    }
 }

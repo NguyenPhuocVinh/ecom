@@ -1,11 +1,11 @@
 import { DISCOUNT_CONDITION, DISCOUNT_STATUS, DISCOUNT_TYPE, ENTITY_NAME } from "src/common/constants/enum";
-import { RootEntity } from "src/cores/entities/base.entity";
+import { CreatedByRootEntity } from "src/cores/entities/created-by-root.entity";
 import { Column, Entity, ManyToOne } from "typeorm";
 import { UserEntity } from "../../users/entities/users.entity";
 import { StoreEntity } from "../../stores/entities/store.entity";
 
 @Entity({ name: ENTITY_NAME.DISCOUNT })
-export class DiscountEntity extends RootEntity {
+export class DiscountEntity extends CreatedByRootEntity {
     @ManyToOne(() => UserEntity, user => user.discounts)
     user: UserEntity;
 

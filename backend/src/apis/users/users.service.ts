@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entities/users.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './entities/dto/create-user.dto';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { OtpEntity } from './entities/otp.entity';
 import * as bcrypt from 'bcrypt';
 
@@ -29,7 +29,7 @@ export class UsersService {
             role: { id: createUserDto.role } as any,
         });
         await this.userRepository.save(user);
-        return user;
+        return _.omit(user, ['password']);
     }
 
     async findOne(email: string) {
